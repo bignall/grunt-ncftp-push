@@ -1,14 +1,14 @@
 var path = require('path');
-var fs = require('fs');
+//var fs = require('fs');
 
 var utils = {
   /**
   * @description Check if the user has provided the required options
-  * @param {object} options - An options object should have two required options
+  * @param {object} options - No options are required
   * @return {bool} bool representing if the provided options are valid
   */
   optionsAreValid: function (options) {
-    return options.host !== undefined && options.dest !== undefined;
+    return typeof options === 'object';
   },
 
   /**
@@ -32,6 +32,7 @@ var utils = {
   *     directories necessary for the file to be successfully pushed
   * @return {string[]} returns an array of partial paths for required directories
   */
+  /*
   getDirectoryPaths: function (filePaths) {
     var directoryPaths = [],
         regex = /\//g,
@@ -52,15 +53,16 @@ var utils = {
 
     return directoryPaths;
   },
-
+   */
   /**
   * @description Takes an array of file objects and returns an array of file paths, This will need to do a few things
   *     it will need to trim cwd from paths, use optional relative destinations, and avoid duplicates
   * @param {string} basePath - Base path provided by options.dest
+  * @param {string} srcBase - Source base for files, will be trimmed from files in creating destination
   * @param {object[]} files - Array of file objects found by grunt
   * @return {object[]} returns a complete array of file path objects, {src: '...', dest: '...'}
   */
-  getFilePaths: function (basePath, files) {
+  getFilePaths: function (basePath, srcBase, files) {
     var filePaths = [],
         destination;
 
@@ -74,6 +76,9 @@ var utils = {
         filepath = path.posix.normalize(filepath);
         // Trim the cwd from the path to prepare it for the destination
         destination = utils.trimCwd(filepath, file.orig.cwd);
+        if (srcBase.length) {
+          destination = utils.trimCwd(destination, srcBase);
+        }
         // Set up the relative destination if one is provided
         if (file.orig.dest) {
           destination = path.posix.join(basePath, file.orig.dest, destination);
@@ -106,20 +111,39 @@ var utils = {
   },
 
   /**
+   * @description Takes an options object and a array of file paths and creates the shell command
+   * @param {object} options - ncftp_push options object
+   * @param {array} files - array of file paths { src: '..', dest: '..' }
+   * @return {string} the shell command to run
+   */
+  createShellCommand: function (options, files) {
+    var command = '';
+    files.forEach(function(file) {
+      command = command + options.ncftp + 'ncftpput -b -R -m -f ' + options.authFile
+				+ ((options.redial) ? ' -r ' + options.redial : '')
+				+ ((options.debug) ? ' -d ' + options.debugFile : '')
+				+ ' ' + file.dest + ' ' + file.src + ';';
+    });
+    return command;
+  }
+
+  /**
   * @description Takes an array of file objects and returns an array of destinations
   * @param {object[]} files - Array of file objects found by grunt
   * @return {string[]} returns an array of destinations, the destinations for the files about to be pushed
   */
+  /*
   getDestinations: function (files) {
     return files.map(function (file) { return file.dest; });
   },
-
+	*/
   /**
   * @description Takes a cache and an array of file objects. Updates the cache and returns files that have been modified
   * @param {object} cache - Cache to update, simple Dictionary of type <string,string>(filename,mtime)
   * @param {object[]} files - Array of file objects found by grunt
   * @return {object<object<string, string>, object[]>} - returns the updated caches and a files object array containing changed files
   */
+  /*
   updateCacheGetChanges: function (cache, files) {
     var stats, mtime;
 
@@ -140,6 +164,7 @@ var utils = {
       files: changes
     };
   }
+  */
 
 };
 

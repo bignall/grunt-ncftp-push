@@ -1,22 +1,21 @@
 /*
- * grunt-ftp
- * https://github.com/Robert-W/grunt-ftp
+ * grunt-ncftp-push
+ * https://bignall.github.io/grunt-ncftp-push/
  *
- * Copyright (c) 2013 Robert Winterbottom
+ * Copyright (c) 2016 Rosina Bignall
  * Licensed under the MIT license.
  */
 var messages = require('./messages');
-var cache = require('./cache');
 var utils = require('./utils');
 var path = require('path');
-var Ftp = require('jsftp');
+//require('grunt-shell');
 
 module.exports = function (grunt) {
   'use strict';
 
   var basepath,
       options,
-      server,
+      shellOptions,
       done;
 
   /**
@@ -24,6 +23,7 @@ module.exports = function (grunt) {
   * @param {object} options - grunt options provided to the plugin
   * @return {object} {username: '...', password: '...'}
   */
+  /*
   var getCredentials = function getCredentials(gruntOptions) {
     if (gruntOptions.authKey && grunt.file.exists('.ftpauth')) {
       return JSON.parse(grunt.file.read('.ftpauth'))[gruntOptions.authKey];
@@ -35,19 +35,21 @@ module.exports = function (grunt) {
       return { username: null, password: null };
     }
   };
+	*/
 
   /**
   * Helper function that uses a recursive style for creating directories until none remain
   * @param {array} directories - Array of directory paths that will be necessary to upload files
   * @param {function} callback - function to trigger when all directories have been created
   */
+  /*
   var pushDirectories = function pushDirectories(directories, callback) {
     var index = 0;
 
     /**
     * Recursive helper used as callback for server.raw.mkd
     * @param {error} err - Error message if something went wrong
-    */
+    * /
     var processDir = function processDir (err) {
       // Fail if any error other then 550 is present, 550 is Directory Already Exists
       // these directories must exist to continue
@@ -73,11 +75,13 @@ module.exports = function (grunt) {
       callback();
     }
   };
+  */
 
   /**
   * Helper function that uses a recursive style for uploading files until none remain
   * @param {object[]} files - Array of file objects to upload, {src: '...', dest: '...'}
   */
+  /*
   var uploadFiles = function uploadFiles(files) {
     var index = 0,
         file = files[index];
@@ -85,7 +89,7 @@ module.exports = function (grunt) {
     /**
     * Recursive helper used as callback for server.raw.put
     * @param {error} err - Error message if something went wrong
-    */
+    * /
     var processFile = function processFile (err) {
       if (err) {
         grunt.log.warn(messages.fileTransferFail(file.dest, err));
@@ -115,22 +119,28 @@ module.exports = function (grunt) {
     // Start uploading files
     server.put(grunt.file.read(file.src, { encoding: null }), file.dest, processFile);
   };
+	*/
 
-  grunt.registerMultiTask('ftp_push', 'Transfer files using FTP.', function() {
+  grunt.registerMultiTask('ncftp_push', 'Transfer files using FTP.', function() {
 
-    var destinations,
-        updated,
-        files,
-        creds,
-        dirs;
+    var files,
+        command;
 
     // Merge task-specific and/or target-specific options with these defaults.
     options = this.options({
-      incrementalUpdates: true,
+      //incrementalUpdates: true,
       // autoReconnect: true,
       // reconnectLimit: 3,
-      hideCredentials: false,
-      keepAlive: 60000
+      //hideCredentials: false,
+      //keepAlive: 60000
+			dest: '', // Destination directory on server
+			srcBase: '', // Source base to trim from files
+			authFile: '.ftpauth', // File to get ftp account info from
+			redial: 3, // Maximum retry attempts
+			ncftp: '', // Path to ncftpput
+			debug: false, // Log debug info?
+			debugFile: 'stdout', // file to log debug info to if enabled
+			shellOptions: {} // options to pass to the shell task
     });
 
     // Tell Grunt not to finish until my async methods are completed, calling done() to finish
@@ -150,7 +160,7 @@ module.exports = function (grunt) {
       return;
     }
 
-    // Remove directories and invalid paths from this.files
+    // Remove invalid paths from this.files
     this.files.forEach(function (file) {
       file.src = file.src.filter(function (filepath) {
         // If the file does not exist, remove it
@@ -158,18 +168,20 @@ module.exports = function (grunt) {
           grunt.log.warn(messages.fileNotExist(filepath));
           return false;
         }
-        // If this is a file, keep it
-        return grunt.file.isFile(filepath);
+
+        // Keep files and directories
+        return grunt.file.isFile(filepath) || grunt.file.isDir(filepath);
       });
     });
 
     // Basepath of where to push
     basepath = path.posix.normalize(options.dest);
     // Get Credentials
-    creds = getCredentials(options);
-    // Get list of file objects to push, containing src & path properties
-    files = utils.getFilePaths(basepath, this.files);
+    //creds = getCredentials(options);
+    // Get list of file objects to push, containing src & dest properties
+    files = utils.getFilePaths(basepath, options.srcBase, this.files);
     //- Only get changes if incrementalUpdates is on
+    /*
     if (options.incrementalUpdates) {
       // Filter these files based on whether or not they have been updated since the last push
       updated = utils.updateCacheGetChanges(cache.get(), files);
@@ -177,11 +189,15 @@ module.exports = function (grunt) {
       files = updated.files;
       cache.set(updated.cache);
     }
+    */
     // Get a list of the required directories to push so the files can be uploaded
     // getDirectoryPaths takes an array of strings, get a string[] of destinations
+    /*
     destinations = utils.getDestinations(files);
     dirs = utils.getDirectoryPaths(destinations);
+    */
     // Create the FileServer
+    /*
     server = new Ftp({
       host: options.host,
       port: options.port || 21,
@@ -190,22 +206,25 @@ module.exports = function (grunt) {
 
     // set keep alive
     server.keepAlive(options.keepAlive);
-
+     */
     // Log if in debug mode
+    /*
     if (options.debug) {
       server.on('jsftp_debug', function(eventType, data) {
         grunt.log.write(messages.debug(eventType));
         grunt.log.write(JSON.stringify(data, null, 2));
       });
     }
+    */
 
-    //- If there are no files to push, bail now
-    if (options.incrementalUpdates && dirs && dirs.length === 0) {
+    // If there are no files to push, bail now
+    if (files && files.length === 0) {
       console.log(messages.noNewFiles);
       done();
     }
 
     // Authenticate with the server and begin pushing files up
+    /*
     server.auth(creds.username, creds.password, function(err) {
       // Use <username> in out put if they chose to hide username
       var usernameForOutput = options.hideCredentials ? '<username>' : creds.username;
@@ -222,7 +241,15 @@ module.exports = function (grunt) {
       });
 
     });
+		*/
+    // Create the shell command
+    command = utils.createShellCommand(options, files);
 
+    // run the shell command
+    shellOptions = {command: command, options: options.shellOptions};
+    grunt.config('shell.ncftp', shellOptions);
+    grunt.task.run('shell:ncftp');
+    done();
   });
 
 };

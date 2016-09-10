@@ -1,25 +1,26 @@
 var fileMocks = require('./mocks/fileObjects');
 var mocks = require('./mocks/utilMocks');
 var utils = require('../tasks/utils');
-var cache = require('../tasks/cache');
+//var cache = require('../tasks/cache');
 var expect = require('chai').expect;
-var fs = require('fs');
+//var fs = require('fs');
 
-describe('ftp_push - utils.optionsAreValid', function () {
+describe('ncftp_push - utils.optionsAreValid', function () {
   'use strict';
 
-  it('should return true if host and dest are in the provided options', function () {
+  it('should always return true', function () {
     expect(utils.optionsAreValid(mocks.optionsUsername)).to.be.true;
     expect(utils.optionsAreValid(mocks.optionsAuthKey)).to.be.true;
   });
 
+  /*
   it('should return false if either host or dest are not in the provided options', function () {
     expect(utils.optionsAreValid(mocks.optionsInvalid)).to.be.false;
   });
-
+	*/
 });
 
-describe('ftp_push - utils.trimCwd', function () {
+describe('ncftp_push - utils.trimCwd', function () {
   'use strict';
 
   it('should return the filepath minus the cwd provided if the cwd provided is at the beginning of the filepath', function () {
@@ -36,11 +37,11 @@ describe('ftp_push - utils.trimCwd', function () {
 
 });
 
-describe('ftp_push - utils.getFilePaths', function () {
+describe('ncftp_push - utils.getFilePaths', function () {
   'use strict';
 
   it('should return an array of normalized filepaths', function () {
-    var results = utils.getFilePaths(fileMocks.test.base, fileMocks.test.files);
+    var results = utils.getFilePaths(fileMocks.test.base, '', fileMocks.test.files);
     expect(results.length).to.equal(fileMocks.test.paths.length);
     results.forEach(function (file) {
       expect(file.src).to.exist;
@@ -52,7 +53,7 @@ describe('ftp_push - utils.getFilePaths', function () {
   it('should accomodate relative destinations specified at the file level to be included in paths', function () {
     var file = fileMocks.test.files[4];
     var expected = fileMocks.test.paths[4];
-    var result = utils.getFilePaths(fileMocks.test.base, [file])[0];
+    var result = utils.getFilePaths(fileMocks.test.base, '', [file])[0];
 
     expect(result.dest).to.equal(expected.dest);
     expect(result.dest).to.not.equal(expected.badPath);
@@ -60,7 +61,7 @@ describe('ftp_push - utils.getFilePaths', function () {
 
   it('should remove the current working directory from the filepath', function () {
     var file = fileMocks.test.files[0];
-    var result = utils.getFilePaths(fileMocks.test.base, [file])[0];
+    var result = utils.getFilePaths(fileMocks.test.base, '', [file])[0];
     // First remove the base from the path, as we dont need to test the basepath, just the relative file path
     // and the basepath may contain a directory similar to the cwd which would skew the results
     var relativePath = result.dest.replace(fileMocks.test.base, '');
@@ -68,7 +69,7 @@ describe('ftp_push - utils.getFilePaths', function () {
   });
 
   it('should not contain any duplicates', function () {
-    var results = utils.getFilePaths(fileMocks.test.base, fileMocks.test.files);
+    var results = utils.getFilePaths(fileMocks.test.base, '', fileMocks.test.files);
     expect(results.length).to.equal(fileMocks.test.paths.length);
 
     var allUnique = results.every(function (file, firstIndex) {
@@ -81,8 +82,17 @@ describe('ftp_push - utils.getFilePaths', function () {
     expect(allUnique).to.be.true;
   });
 
+  it('should remove the srcBase from the file path', function() {
+		var file = fileMocks.test.srcBaseFile;
+		var expected = fileMocks.test.srcBaseResult;
+		var result = utils.getFilePaths(fileMocks.test.base, fileMocks.test.srcBase, [file]);
+		expect(result.length).to.equal(1);
+		expect(result[0].dest).to.equal(expected.dest);
+  });
+
 });
 
+/*
 describe('ftp_push - utils.getDirectoryPaths', function () {
   'use strict';
 
@@ -121,8 +131,9 @@ describe('ftp_push - utils.getDirectoryPaths', function () {
   });
 
 });
+*/
 
-describe('ftp_push - utils.arrayContainsFile', function () {
+describe('ncftp_push - utils.arrayContainsFile', function () {
   'use strict';
 
   it('should return true when passed a destination and an array of files containing that destination', function () {
@@ -135,6 +146,7 @@ describe('ftp_push - utils.arrayContainsFile', function () {
 
 });
 
+/*
 describe('ftp_push - utils.getChangesAndUpdateCache', function () {
   'use strict';
   /**
@@ -143,7 +155,7 @@ describe('ftp_push - utils.getChangesAndUpdateCache', function () {
   * - Add documentation in Code
   * - Make option so this feature can be turned on or off
   * - Make this feature turned on by default
-  */
+  * /
 
   beforeEach(function () {
     // Reset the cache
@@ -213,3 +225,33 @@ describe('ftp_push - utils.getChangesAndUpdateCache', function () {
 
 
 });
+*/
+
+describe('ncftp_push - utils.createShellCommand', function () {
+  'use strict';
+
+  it('should return command using the default options and file passed into it', function () {
+		var expected = fileMocks.test.command[0];
+		var results = utils.createShellCommand(fileMocks.test.options[0], [fileMocks.test.srcBaseResult]);
+    expect(results).to.equal(expected);
+  });
+
+  it('should return use the alternate auth path, no retries and default debug path from options and file passed into it', function () {
+		var expected = fileMocks.test.command[1];
+		var results = utils.createShellCommand(fileMocks.test.options[1], [fileMocks.test.srcBaseResult]);
+    expect(results).to.equal(expected);
+  });
+
+  it('should return use the alternate debug path from options and file passed into it', function () {
+		var expected = fileMocks.test.command[2];
+		var results = utils.createShellCommand(fileMocks.test.options[2], [fileMocks.test.srcBaseResult]);
+    expect(results).to.equal(expected);
+  });
+
+  it('should return use the default options and multiple files passed into it', function () {
+		var expected = fileMocks.test.command[3];
+		var results = utils.createShellCommand(fileMocks.test.options[0], [fileMocks.test.paths[0], fileMocks.test.paths[1]]);
+    expect(results).to.equal(expected);
+  });
+});
+
