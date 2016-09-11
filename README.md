@@ -1,4 +1,4 @@
-# grunt-ncftp-push  [![Build Status](https://travis-ci.org/bignall/grunt-ncftp-push.svg?branch=0.1.0)](https://travis-ci.org/bignall/grunt-ncftp-push)
+# grunt-ncftp-push  [![Build Status](https://travis-ci.org/bignall/grunt-ncftp-push.svg?branch=grunt-ncftp-push-0.1.0)](https://travis-ci.org/bignall/grunt-ncftp-push)
 
 > Deploy your files to a FTP server <br>
 
