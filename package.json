@@ -20,7 +20,7 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "test": " mocha ./test/*.js"
+    "test": "eslint tasks/*.js && eslint test/* && mocha ./test/*.js"
   },
   "peerDependencies": {
     "grunt": ">=0.4.0"
@@ -32,7 +32,6 @@
   "devDependencies": {
     "chai": "^3.2.0",
     "eslint": "^1.1.0",
-    "ftp-test-server": "0.0.2",
     "mocha": "^2.3.0"
   },
   "keywords": [

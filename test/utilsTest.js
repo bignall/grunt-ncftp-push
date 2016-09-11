@@ -1,9 +1,7 @@
 var fileMocks = require('./mocks/fileObjects');
 var mocks = require('./mocks/utilMocks');
 var utils = require('../tasks/utils');
-//var cache = require('../tasks/cache');
 var expect = require('chai').expect;
-//var fs = require('fs');
 
 describe('ncftp_push - utils.optionsAreValid', function () {
   'use strict';
@@ -93,47 +91,6 @@ describe('ncftp_push - utils.getFilePaths', function () {
 
 });
 
-/*
-describe('ftp_push - utils.getDirectoryPaths', function () {
-  'use strict';
-
-  // for example, /foo/bar/baz/index.js should return ['/foo', '/foo/bar', '/foo/bar/baz']
-  it('should return an array of directories partial paths', function () {
-    var dirPaths = utils.getDirectoryPaths(mocks.dirPath.files);
-    // Should be the same length
-    expect(dirPaths.length).to.equal(mocks.dirPath.expected.length);
-    // Each item in the dirPaths should also be in mocks.dirPath.expected
-    var allPresent = dirPaths.every(function (path) {
-      return mocks.dirPath.expected.indexOf(path) > -1;
-    });
-    expect(allPresent).to.be.true;
-  });
-
-  it('should not contain any duplicates', function () {
-    var dirPaths = utils.getDirectoryPaths(mocks.dirPathBad.files);
-    // Should be the same length
-    expect(dirPaths.length).to.equal(mocks.dirPathBad.expected.length);
-    // Each items index and lastIndex should be the same, if there not, then there is a duplicate
-    var allUnique = dirPaths.every(function (path) {
-      return dirPaths.indexOf(path) === dirPaths.lastIndexOf(path);
-    });
-    expect(allUnique).to.be.true;
-  });
-
-  it('should not contain any empty paths', function () {
-    var dirPaths = utils.getDirectoryPaths(mocks.dirPathBad.files);
-    // Should be the same length
-    expect(dirPaths.length).to.equal(mocks.dirPathBad.expected.length);
-    // There should not be a single entry where path === ''
-    var noBlanks = dirPaths.every(function (path) {
-      return path !== '';
-    });
-    expect(noBlanks).to.be.true;
-  });
-
-});
-*/
-
 describe('ncftp_push - utils.arrayContainsFile', function () {
   'use strict';
 
@@ -146,87 +103,6 @@ describe('ncftp_push - utils.arrayContainsFile', function () {
   });
 
 });
-
-/*
-describe('ftp_push - utils.getChangesAndUpdateCache', function () {
-  'use strict';
-  /**
-  * TODO:
-  * - Add documentation in README
-  * - Add documentation in Code
-  * - Make option so this feature can be turned on or off
-  * - Make this feature turned on by default
-  * /
-
-  beforeEach(function () {
-    // Reset the cache
-    cache.set({});
-  });
-
-  it('should write each file\'s mtime in the cache', function () {
-    var localCache = cache.get();
-    var fobjects = [
-      { src: '.editorconfig', dest: '.editorconfig'},
-      { src: '.gitignore', dest: '.gitignore'},
-      { src: 'LICENSE-MIT', dest: 'LICENSE-MIT'}
-    ];
-    var files = utils.updateCacheGetChanges(localCache, fobjects).files;
-    var knownMTimes = {
-      '../.editorconfig': 1441828996000,
-      '../.gitignore': 1441828996000,
-      '../LICENSE-MIT': 1439475864000
-    };
-
-    expect(files.length).to.equal(fobjects.length);
-    expect(files.every(function (file, i) { return file === fobjects[i].src; }));
-    expect(files.every(function (file) { return cache[file] === knownMTimes[file]; }));
-  });
-
-  it('should return a list of paths with new mtime\'s and the updated cache', function (done) {
-    var localCache = cache.get();
-    // These first three should not change, add a test file, currently needs to be manually updated
-    var fobjects = [
-      { src: '.editorconfig', dest: '.editorconfig'},
-      { src: '.gitignore', dest: '.gitignore'},
-      { src: 'LICENSE-MIT', dest: 'LICENSE-MIT'},
-      { src: 'files/js/alert.js', dest: 'files/js/alert.js'}
-    ];
-    var updates = utils.updateCacheGetChanges(localCache, fobjects);
-    var newTimestamp = new Date(Date.now());
-
-    // Save the original times
-    var times = {
-      '.editorconfig': updates.cache['.editorconfig'],
-      '.gitignore': updates.cache['.gitignore'],
-      'LICENSE-MIT': updates.cache['LICENSE-MIT'],
-      'files/js/alert.js': updates.cache['files/js/alert.js']
-    };
-
-    // Update the cache
-    cache.set(updates.cache);
-
-    // We should have four files since none are present in the cache
-    expect(updates.files.length).to.equal(fobjects.length);
-    // Let's modify the alert.js file
-    fs.utimes('files/js/alert.js', newTimestamp, newTimestamp, function () {
-      // Now get the updates
-      updates = utils.updateCacheGetChanges(cache.get(), fobjects);
-      // and see if we only have a single file now
-      expect(updates.files.length).to.equal(1);
-      // and see if the cache was properly updated
-      expect(updates.cache['files/js/alert.js']).to.be.above(times['files/js/alert.js']);
-      // These were not modified so the cache should be the same
-      expect(updates.cache['.editorconfig']).to.equal(times['.editorconfig']);
-      expect(updates.cache['.gitignore']).to.equal(times['.gitignore']);
-      expect(updates.cache['LICENSE-MIT']).to.equal(times['LICENSE-MIT']);
-      done();
-    });
-
-  });
-
-
-});
-*/
 
 describe('ncftp_push - utils.createShellCommand', function () {
   'use strict';
