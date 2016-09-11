@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Grunt-ncftp-push by bignall</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Grunt-ncftp-push</h1>
+      <h2 class="project-tagline">Deploy your files to a FTP server</h2>
+      <a href="https://github.com/bignall/grunt-ncftp-push" class="btn">View on GitHub</a>
+      <a href="https://github.com/bignall/grunt-ncftp-push/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/bignall/grunt-ncftp-push/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="grunt-ncftp-push--" class="anchor" href="#grunt-ncftp-push--" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>grunt-ncftp-push  <a href="https://travis-ci.org/bignall/grunt-ncftp-push"><img src="https://travis-ci.org/bignall/grunt-ncftp-push.svg?branch=grunt-ncftp-push-0.1.0" alt="Build Status"></a>
+</h1>
+
+<blockquote>
+<p>Deploy your files to a FTP server <br></p>
+</blockquote>
+
+<h2>
+<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting Started</h2>
+
+<h3>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requirements</h3>
+
+<p>Grunt <code>~0.4.5</code><br>
+<a href="http://ncftp.com/">Ncftp</a></p>
+
+<h4>
+<a id="optional-requirements" class="anchor" href="#optional-requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Optional Requirements</h4>
+
+<p>Grunt watch</p>
+
+<h3>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install</h3>
+
+<p>If you haven't used <a href="http://gruntjs.com/">Grunt</a> before, be sure to check out the <a href="http://gruntjs.com/getting-started">Getting Started</a> guide, as it explains how to create a <a href="http://gruntjs.com/sample-gruntfile">Gruntfile</a> as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:</p>
+
+<div class="highlight highlight-source-shell"><pre>npm install grunt-ncftp-push --save-dev</pre></div>
+
+<p>Once the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">grunt</span>.<span class="pl-en">loadNpmTasks</span>(<span class="pl-s"><span class="pl-pds">'</span>grunt-ncftp-push<span class="pl-pds">'</span></span>);</pre></div>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>Grunt-ncftp-push adds two grunt taks you can use.</p>
+
+<h3>
+<a id="the-ncftp_push-task" class="anchor" href="#the-ncftp_push-task" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The "ncftp_push" task</h3>
+
+<h4>
+<a id="overview" class="anchor" href="#overview" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Overview</h4>
+
+<p>The <code>ncftp_push</code> task pushes all the files given to it to the ftp server.  Usually you would use this to upload your entire project or parts of your project to the ftp server at once.  </p>
+
+<h4>
+<a id="usage-1" class="anchor" href="#usage-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h4>
+
+<p>In your project's Gruntfile, add a section named <code>ncftp_push</code> to the data object passed into <code>grunt.initConfig()</code>.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">grunt</span>.<span class="pl-en">initConfig</span>({
+  ncftp_push<span class="pl-k">:</span> {
+    all<span class="pl-k">:</span> {
+      options<span class="pl-k">:</span> {
+        dest<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>destination/directory/on/ftp/server<span class="pl-pds">'</span></span>
+      },
+      files<span class="pl-k">:</span> [{expand<span class="pl-k">:</span> <span class="pl-c1">true</span>, src<span class="pl-k">:</span> [<span class="pl-s"><span class="pl-pds">'</span>trunk/*<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>!trunk/composer*<span class="pl-pds">'</span></span>]}]
+    }
+  }
+})</pre></div>
+
+<h4>
+<a id="options" class="anchor" href="#options" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Options</h4>
+
+<p>All options are optional but you'll at least want to specify a destination directory
+otherwise it will go to the root directory of the ftp account.</p>
+
+<h5>
+<a id="dest" class="anchor" href="#dest" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>dest</h5>
+
+<p>Type: <code>String</code><br>
+Default: <code>/</code><br>
+Required: false</p>
+
+<p>Destination of where you want your files pushed to, relative to the host.</p>
+
+<h5>
+<a id="srcbase" class="anchor" href="#srcbase" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>srcBase</h5>
+
+<p>Type: <code>String</code><br>
+Default: ``<br>
+Required: false</p>
+
+<p>Base of your source files relative to the project base that you want trimmed
+from the file names prior to uploading them to make the filename correct relative
+to the dest.</p>
+
+<h5>
+<a id="authfile" class="anchor" href="#authfile" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>authFile</h5>
+
+<p>Type: <code>String</code><br>
+Default: <code>.ftpauth</code><br>
+Required: false</p>
+
+<p>File to get the destination host and authorization credentials from. Default filename is <code>.ftpauth</code>.  File should be in the following format:</p>
+
+<pre lang="txt"><code>host my.hostname.com
+user myUsername
+pass myPassword
+</code></pre>
+
+<p>Note that spacing is important and lines starting with # and blank lines will be ignored. For more information on this file see the ncftp docs.</p>
+
+<h5>
+<a id="redial" class="anchor" href="#redial" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>redial</h5>
+
+<p>Type: <code>Integer</code><br>
+Default: 3<br>
+Required: false </p>
+
+<p>Maximum number of retry attempts</p>
+
+<h5>
+<a id="ncftppath" class="anchor" href="#ncftppath" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ncftpPath</h5>
+
+<p>Type: <code>String</code><br>
+Default: ``<br>
+Required: false</p>
+
+<p>Path to the ncftpput command. `` means that the command can be executed without specifying a path. If a path is used it must contain the trailing slash.</p>
+
+<h5>
+<a id="join" class="anchor" href="#join" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>join</h5>
+
+<p>Type: <code>String</code><br>
+Default: <code>&amp;&amp;</code><br>
+Required: false</p>
+
+<p>How to join the commands together when there are multiple files. Options are <code>&amp;&amp;</code>, <code>&amp;</code>, and <code>;</code>. The default is <code>&amp;&amp;</code> which means only run the next command if the previous one succeeded. <code>;</code> will run the commands sequentially and <code>&amp;</code> will run the commands concurrently. Running the commands concurrently is usually not a good idea since most ftp servers have limits on concurrent connections. See the documentation for grunt-shell for more information on these options.</p>
+
+<h5>
+<a id="shelloptions" class="anchor" href="#shelloptions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>shellOptions</h5>
+
+<p>Type: <code>Object</code><br>
+Default: {} <br>
+Required: false</p>
+
+<p>Additional options to pass to the grunt-shell task. See the documents for grunt-shell for more information on the options that can be included.</p>
+
+<h5>
+<a id="debug" class="anchor" href="#debug" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>debug</h5>
+
+<p>Type: <code>Boolean</code><br>
+Default: <code>false</code><br>
+Required: false</p>
+
+<p>Enable debug mode for the ncftpput command to allow for verbose messages.  This can be useful if the commands are failing and you can't see why. The entire conversation with the server will be output. See the ncftp documentation for more information.</p>
+
+<h5>
+<a id="debugfile" class="anchor" href="#debugfile" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>debugFile</h5>
+
+<p>Type: <code>String</code><br>
+Default: <code>stdout</code><br>
+Required: false</p>
+
+<p>File to send the debug info to if debug is true. The special string <code>stdout</code> means it will be sent to the terminal.</p>
+
+<h3>
+<a id="the-ncftp_watch-task" class="anchor" href="#the-ncftp_watch-task" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The "ncftp_watch" task</h3>
+
+<h4>
+<a id="overview-1" class="anchor" href="#overview-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Overview</h4>
+
+<p>The <code>ncftp_watch</code> task is meant to be used with <code>grunt watch</code>. It pushes changed files to the server when the <code>watch</code> event fires.  If one task is already running it will keep track of the changed files and run another task when the current one is finished.</p>
+
+<h4>
+<a id="usage-2" class="anchor" href="#usage-2" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h4>
+
+<p>In your project's Gruntfile, add a section named <code>ncftp_watch</code> to the data object passed into <code>grunt.initConfig()</code>. Also add a sub-task to the <code>watch</code> task in your grunt config that runs the <code>ncftp_watch</code> task.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">grunt</span>.<span class="pl-en">initConfig</span>({
+  watch<span class="pl-k">:</span> {
+    ncftp_watch<span class="pl-k">:</span> {
+      files<span class="pl-k">:</span> [ <span class="pl-s"><span class="pl-pds">'</span>trunk/**/*<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>!trunk/composer*<span class="pl-pds">'</span></span>],
+      tasks<span class="pl-k">:</span> [<span class="pl-s"><span class="pl-pds">'</span>ncftp_watch<span class="pl-pds">'</span></span>],
+      options<span class="pl-k">:</span> {
+        atBegin<span class="pl-k">:</span> <span class="pl-c1">true</span>,
+        spawn<span class="pl-k">:</span> <span class="pl-c1">false</span>,
+        debounceDelay<span class="pl-k">:</span> <span class="pl-c1">500</span>
+      }
+    }
+  },
+  ncftp_watch<span class="pl-k">:</span> {
+      options<span class="pl-k">:</span> {
+        dest<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>wp-content/plugins/credit-helper-elite<span class="pl-pds">'</span></span>,
+        srcBase<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>trunk/<span class="pl-pds">'</span></span>
+      },
+      files<span class="pl-k">:</span> [<span class="pl-s"><span class="pl-pds">'</span>trunk/**<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>!trunk/composer*<span class="pl-pds">'</span></span>]
+    }
+  }
+})</pre></div>
+
+<h4>
+<a id="ncftp_watch-options" class="anchor" href="#ncftp_watch-options" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>ncftp_watch</code> Options</h4>
+
+<p>The <code>ncftp_watch</code> task can have all the same options as the <code>ncftp_push</code> task.  These options will be used in configuring an <code>ncftp_push:watch</code> task which will be started up as needed. </p>
+
+<p>The files given to this task will be used to match against changed files so that only files that match these patterns are uploaded to the server.</p>
+
+<h4>
+<a id="watch-ncftp_watch-options" class="anchor" href="#watch-ncftp_watch-options" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>watch</code> <code>ncftp_watch</code> Options</h4>
+
+<p>The <code>ncftp_watch</code> sub-task of the <code>watch</code> task is a typical <code>watch</code> task.  </p>
+
+<p>You should include <code>atBegin: true</code> so that the <code>ncftp_watch</code> command runs when <code>grunt watch</code> first starts up. This sets up the watchers to catch the changed files and keep track of whether the <code>ncftp_push:watch</code> task is queued, and start it up if there are already changed files (there shouldn't be at this point, so the <code>ncftp_push:watch</code> task won't run at this point). If you don't set <code>atBegin</code> to true the watchers will start up the first time the <code>ncftp_watch</code> task is run, but any changed files that came before that run will not be uploaded. </p>
+
+<p><code>spawn</code> must be set to false. The <code>ncftp_watch</code> task must run in the same process as the <code>watch</code> task so that it can capture <code>watch</code> events and internal <code>ncftp_start</code> and <code>ncftp_finish</code> events emmitted by the <code>ncftp_push</code> task. </p>
+
+<p><code>debounceDelay</code> can be set to whatever works for you but the default <code>500</code> seems to work well (so it can technically be left off).</p>
+
+<p>The <code>ncftp_watch</code> task should be your last <code>watch</code> task. This way it can capture all changed files from tasks that came before it and run an additional <code>ncftp_push:watch</code> task if there are any remaining changed files that haven't been pushed to the server yet when it runs (usually the watchers will have taken care of this so it won't start at this point).  </p>
+
+<p>When you make changes to a file that causes changes to other files to be made by other watch tasks you will typically see the <code>ncftp_push:watch</code> task run multiple times.  This is because the event watcher catches the files and queues up an <code>ncftp_push:watch</code> task, then more changed files are caught while that task is waiting to be run, so when that <code>ncftp_push:watch</code> task finishes another one is queued. More files may be caught after that task is queued so it can happen again. As long as there are changed files in the queue it will queue another task each time the previous one finishes. </p>
+
+<p>This can also be useful to configure livereload to automatically reload your web page when files are changed. Just add <code>livereload: true</code> to the options. Check out the <code>grunt watch</code> documentation about configuring and using livereload.</p>
+
+<h3>
+<a id="usage-examples" class="anchor" href="#usage-examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage Examples</h3>
+
+<h4>
+<a id="sample-ftpauth-file" class="anchor" href="#sample-ftpauth-file" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Sample .ftpauth file</h4>
+
+<p>This file's default name is <code>.ftpauth</code> and is in the same directory as your <code>Gruntfile.js</code>.  You should add this file to your <code>.gitignore</code> so that it is not uploaded to your git repository or specify another file that is not in your project path.</p>
+
+<p>The format of this file is specified by <code>ncftp</code> and more documentation on it can be found in the <code>ncftp</code> docs. It contains the hostname, username and password for the destination ftp server.</p>
+
+<pre lang="txt"><code>host my.hostname.com
+user myUsername
+pass myPassword
+</code></pre>
+
+<h4>
+<a id="extras" class="anchor" href="#extras" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Extras</h4>
+
+<p>You can specify a destination inside your files objects like so:</p>
+
+<div class="highlight highlight-source-js"><pre>{expand<span class="pl-k">:</span> <span class="pl-c1">true</span>,cwd<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>test<span class="pl-pds">'</span></span>,src<span class="pl-k">:</span> [<span class="pl-s"><span class="pl-pds">'</span>**/*<span class="pl-pds">'</span></span>]},
+{expand<span class="pl-k">:</span> <span class="pl-c1">true</span>,cwd<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>tasks<span class="pl-pds">'</span></span>,src<span class="pl-k">:</span> [<span class="pl-s"><span class="pl-pds">'</span>**/*<span class="pl-pds">'</span></span>], dest<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>test/<span class="pl-pds">'</span></span> }</pre></div>
+
+<p>This will allow you to configure where you push your code in case you want to push to a diretory structure that is different from your local one.  The dest here <strong>MUST</strong> be relative to the root destination.</p>
+
+<p>Source files can be individual files or they can be directories. Directories will be pushed recursively so all files and other directories within that directory will be pushed to the destination.  So if you want to include an entire directory to upload do it like so:</p>
+
+<div class="highlight highlight-source-js"><pre>{expand<span class="pl-k">:</span> <span class="pl-c1">true</span>, src<span class="pl-k">:</span> [<span class="pl-s"><span class="pl-pds">'</span>mydirectory<span class="pl-pds">'</span></span>]}</pre></div>
+
+<p>This works only for the <code>ncftp_push</code> task. The <code>ncftp_watch</code> task can only have one destination since files come from the <code>watch</code> events.</p>
+
+<h3>
+<a id="notes" class="anchor" href="#notes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Notes</h3>
+
+<p>The output from <code>ncftpput</code> appears in the terminal twice. I don't believe the commands are being run twice it's just output twice. It has something to do with <code>grunt-shell</code>. I welcome any suggestions for how to solve it but for now it will just be there twice.</p>
+
+<h2>
+<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Dependencies</h2>
+
+<p>This plugin uses Sindre Sorhus <a href="https://github.com/sindresorhus/grunt-shell"><code>grunt-shell</code></a> module.</p>
+
+<h2>
+<a id="to-do" class="anchor" href="#to-do" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>To do</h2>
+
+<p>Combine files with the same destination to a single <code>ncftpput</code> command.</p>
+
+<h2>
+<a id="acknowledgements" class="anchor" href="#acknowledgements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Acknowledgements</h2>
+
+<p>This module was originally based on the <code>grunt-ftp-push</code> module by Robert Winterbottom and many of the utility functions are the same or very similar but the task code is now very different.</p>
+
+<h2>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contributing</h2>
+
+<p>Fork the repo. Make your changes then submit a pull request.</p>
+
+<p>Please add unit tests in the root of the test folder for any new or changed functionality and please try to make sure that <code>npm test</code> will pass before submitting a pull request.</p>
+
+<p>Thanks for contributing!</p>
+
+<h2>
+<a id="release-history" class="anchor" href="#release-history" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Release History</h2>
+
+<ul>
+<li>2016/09/11 Initial release
+</li>
+</ul>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/bignall/grunt-ncftp-push">Grunt-ncftp-push</a> is maintained by <a href="https://github.com/bignall">bignall</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
