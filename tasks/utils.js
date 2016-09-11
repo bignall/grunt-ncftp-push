@@ -72,7 +72,7 @@ var utils = {
     files.forEach(function (file) {
       // For each src file we have
       file.info.forEach(function (info) {
-      	filepath = info.path;
+        var filepath = info.path;
         // Make sure the path is normalized
         filepath = path.posix.normalize(filepath);
         // Trim the cwd from the path to prepare it for the destination
@@ -88,7 +88,7 @@ var utils = {
         }
         // Remove the filename from the destination
         destination = path.posix.dirname(destination);
-        
+
         // If a the file src is not in the array, add the file, this matched on source
         if (!utils.arrayContainsFile(filePaths, filepath)) {
           filePaths.push({
@@ -124,11 +124,12 @@ var utils = {
   createShellCommand: function (options, files) {
     var command = [];
     files.forEach(function(file) {
-    	if (file.isDir) { var recurse = '-R'} else {recurse = ''}
-      command.push(options.ncftp + 'ncftpput ' + recurse + ' -m -f ' + options.authFile
-				+ ((options.redial) ? ' -r ' + options.redial : '')
-				+ ((options.debug) ? ' -d ' + options.debugFile : '')
-				+ ' ' + file.dest + ' ' + file.src);
+      var recurse = (file.isDir) ? '-R' : '';
+      command.push(options.ncftp + 'ncftpput ' + recurse
+        + ' -m -f ' + options.authFile
+        + ((options.redial) ? ' -r ' + options.redial : '')
+        + ((options.debug) ? ' -d ' + options.debugFile : '')
+        + ' ' + file.dest + ' ' + file.src);
     });
     return command;
   }

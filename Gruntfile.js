@@ -48,6 +48,21 @@ module.exports = function(grunt) {
         ]
       }
 
+    }, 
+    watch: {
+      ncftp_watch: {
+        files: [
+                'trunk/**/*',
+                '!trunk/composer*'
+                ],
+        tasks: ['ncftp_watch'],
+        options: {
+            atBegin: true,
+            spawn: false,
+            interrupt: true,
+            debounceDelay: 500
+        }
+
     }
 
   });

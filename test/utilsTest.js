@@ -46,7 +46,8 @@ describe('ncftp_push - utils.getFilePaths', function () {
     results.forEach(function (file) {
       expect(file.src).to.exist;
       expect(file.dest).to.exist;
-      expect(utils.arrayContainsFile(fileMocks.test.paths, file.dest)).to.be.true;
+      expect(file.isDir).to.exist;
+      expect(utils.arrayContainsFile(fileMocks.test.paths, file.src)).to.be.true;
     });
   });
 
@@ -76,7 +77,7 @@ describe('ncftp_push - utils.getFilePaths', function () {
         return results.every(function (file2, secondIndex) {
           // Return true if the destinations are not the same or if the index
           // is the same because that means its the same file
-          return file.dest !== file2.dest || firstIndex === secondIndex;
+          return file.src !== file2.src || firstIndex === secondIndex;
         });
     });
     expect(allUnique).to.be.true;
@@ -137,11 +138,11 @@ describe('ncftp_push - utils.arrayContainsFile', function () {
   'use strict';
 
   it('should return true when passed a destination and an array of files containing that destination', function () {
-    expect(utils.arrayContainsFile(mocks.arrayMatch.files, mocks.arrayMatch.duplicateDest)).to.be.true;
+    expect(utils.arrayContainsFile(mocks.arrayMatch.files, mocks.arrayMatch.duplicateSrc)).to.be.true;
   });
 
   it('should return false when passed a destination and an array of files that does not have that destination', function () {
-    expect(utils.arrayContainsFile(mocks.arrayMatch.files, mocks.arrayMatch.uniqueDest)).to.be.false;
+    expect(utils.arrayContainsFile(mocks.arrayMatch.files, mocks.arrayMatch.uniqueSrc)).to.be.false;
   });
 
 });
@@ -231,27 +232,39 @@ describe('ncftp_push - utils.createShellCommand', function () {
   'use strict';
 
   it('should return command using the default options and file passed into it', function () {
-		var expected = fileMocks.test.command[0];
-		var results = utils.createShellCommand(fileMocks.test.options[0], [fileMocks.test.srcBaseResult]);
-    expect(results).to.equal(expected);
+	var expected = fileMocks.test.command[0];
+	var results = utils.createShellCommand(fileMocks.test.options[0], [fileMocks.test.srcBaseResult]);
+    expect(results.length).to.equal(expected.length);
+    expect(results[0]).to.equal(expected[0]);
   });
 
   it('should return use the alternate auth path, no retries and default debug path from options and file passed into it', function () {
-		var expected = fileMocks.test.command[1];
-		var results = utils.createShellCommand(fileMocks.test.options[1], [fileMocks.test.srcBaseResult]);
-    expect(results).to.equal(expected);
+	var expected = fileMocks.test.command[1];
+	var results = utils.createShellCommand(fileMocks.test.options[1], [fileMocks.test.srcBaseResult]);
+    expect(results.length).to.equal(expected.length);
+    expect(results[0]).to.equal(expected[0]);
   });
 
   it('should return use the alternate debug path from options and file passed into it', function () {
-		var expected = fileMocks.test.command[2];
-		var results = utils.createShellCommand(fileMocks.test.options[2], [fileMocks.test.srcBaseResult]);
-    expect(results).to.equal(expected);
+	var expected = fileMocks.test.command[2];
+	var results = utils.createShellCommand(fileMocks.test.options[2], [fileMocks.test.srcBaseResult]);
+    expect(results.length).to.equal(expected.length);
+    expect(results[0]).to.equal(expected[0]);
   });
 
   it('should return use the default options and multiple files passed into it', function () {
-		var expected = fileMocks.test.command[3];
-		var results = utils.createShellCommand(fileMocks.test.options[0], [fileMocks.test.paths[0], fileMocks.test.paths[1]]);
-    expect(results).to.equal(expected);
+	var expected = fileMocks.test.command[3];
+	var results = utils.createShellCommand(fileMocks.test.options[0], [fileMocks.test.paths[0], fileMocks.test.paths[1]]);
+	expect(results.length).to.equal(expected.length);
+    expect(results[0]).to.equal(expected[0]);
+    expect(results[1]).to.equal(expected[1]);
+  });
+
+  it('should use -R when directory is used', function () {
+    var expected = fileMocks.test.command[4];
+    var results = utils.createShellCommand(fileMocks.test.options[0], [fileMocks.test.dirFileResult]);
+    expect(results.length).to.equal(expected.length);
+    expect(results[0]).to.equal(expected[0]);
   });
 });
 

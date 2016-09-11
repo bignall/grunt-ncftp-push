@@ -17,10 +17,10 @@ module.exports = function (grunt) {
       options,
       shellOptions,
       done,
-    	running = false,
+      running = false,
       watcherStarted = false,
       startNcftp = null;
-  
+
   /**
   * Based off of whats in the options, create a credentials object
   * @param {object} options - grunt options provided to the plugin
@@ -129,7 +129,7 @@ module.exports = function (grunt) {
     var files,
         commands,
         callback;
-    
+
     // Merge task-specific and/or target-specific options with these defaults.
     options = this.options({
       //incrementalUpdates: true,
@@ -178,7 +178,7 @@ module.exports = function (grunt) {
         return grunt.file.isFile(filepath) || grunt.file.isDir(filepath);
       });
       file.info = file.src.map(function(filepath) {
-      	return {path: filepath, isDir: grunt.file.isDir(filepath)};
+        return {path: filepath, isDir: grunt.file.isDir(filepath)};
       });
     });
 
@@ -252,7 +252,7 @@ module.exports = function (grunt) {
 		*/
     // Let the world know we're running
     grunt.event.emit('ncftp_start', files);
-    
+
     // Create the shell command
     commands = utils.createShellCommand(options, files);
 
@@ -260,72 +260,76 @@ module.exports = function (grunt) {
     callback = options.shellOptions.callback;
     shellOptions = {command: commands.join(options.join), options: options.shellOptions};
     shellOptions.options.callback = function(err, stdout, stderr, cb) {
-    	grunt.event.emit('ncftp_finish');
-    	if (callback) {
-    		callback(err, stdout, stderr, cb);
-    	} else {
-    		cb(err);
-    	}
+      grunt.event.emit('ncftp_finish');
+      if (callback) {
+        callback(err, stdout, stderr, cb);
+      } else {
+        cb(err);
+      }
     };
     grunt.config('shell.ncftp', shellOptions);
     grunt.task.run('shell:ncftp');
-    
+
     //grunt.event.emit('ncftp_finish');
     done();
   });
-  
+
   grunt.registerTask('ncftp_watch', 'Use with watch to capture file changes', function() {
-  	// Start up the watcher if it hasn't already been started
-  	if (!watcherStarted) {
+    // Start up the watcher if it hasn't already been started
+    if (!watcherStarted) {
       var changedFiles = Object.create(null),
-      	fileFilter = grunt.config.get('ncftp_watch').files;
-	
-	  	grunt.config('ncftp_push.watch.options', this.options());
-	
-	    startNcftp = function() {
-	    	if (!running && Object.keys(changedFiles).length) {
-	    		running = true;
-		  		var files = Object.keys(changedFiles).map(function(file) {
-		  			return {expand: true, src: file};
-		  		});
-		  		grunt.config('ncftp_push.watch.files', files);
-		  		grunt.task.run('ncftp_push:watch');
-	    	} else {
-	    		running = false;
-	    	}
-	    };
-	
-	    grunt.event.on('watch', function(action, filepath) {
-	    	if (fileFilter && grunt.file.isMatch(fileFilter, filepath)) {
-	  	    changedFiles[filepath] = action;
-	  	    if (!running) {
-	  	    	startNcftp();
-	  	    }
-	    	}
-	    });
-	    
-	    grunt.event.on('ncftp_start', function(files) {
-	    	running = true;
-	    	// delete changedFiles that are in this list of files
-	    	Object.keys(changedFiles).forEach(function(filepath) {
-	    		if (utils.arrayContainsFile(files, filepath)) {
-	    			delete changedFiles[filepath];
-	    		}
-	    	});
-	    });
-	    
-	    grunt.event.on('ncftp_finish', function() {
-    		running = false;
-    		startNcftp();
-	    });
-	    
-	    watcherStarted = true;
-  	}
-  	
-  	// In case we were started because files changed, start running
-  	if (!running) {
-  		startNcftp();
-  	}
+        fileFilter = grunt.config.get('ncftp_watch').files;
+
+      grunt.config('ncftp_push.watch.options', this.options());
+
+      startNcftp = function()
+      {
+        if (!running && Object.keys(changedFiles).length)
+        {
+          running = true;
+          var files = Object.keys(changedFiles).map(function(file)
+            {
+              return {expand: true, src: file};
+            });
+
+          grunt.config('ncftp_push.watch.files', files);
+          grunt.task.run('ncftp_push:watch');
+          } else {
+            running = false;
+          }
+      };
+
+      grunt.event.on('watch', function(action, filepath) {
+        if (fileFilter && grunt.file.isMatch(fileFilter, filepath))
+        {
+          changedFiles[filepath] = action;
+          if (!running)
+          {
+            startNcftp();
+          }
+        }
+      });
+
+      grunt.event.on('ncftp_start', function(files) {
+        running = true;
+        Object.keys(changedFiles).forEach(function(filepath) {
+          if (utils.arrayContainsFile(files, filepath)) {
+            delete changedFiles[filepath];
+          }
+        });
+      });
+
+      grunt.event.on('ncftp_finish', function() {
+        running = false; startNcftp();
+      });
+
+      watcherStarted = true;
+    }
+
+    // In case we were started because files changed, start running
+    if (!running) {
+      startNcftp();
+    }
   });
 
 };
