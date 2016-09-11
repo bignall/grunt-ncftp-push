@@ -16,8 +16,11 @@ module.exports = function (grunt) {
   var basepath,
       options,
       shellOptions,
-      done;
-
+      done,
+    	running = false,
+      watcherStarted = false,
+      startNcftp = null;
+  
   /**
   * Based off of whats in the options, create a credentials object
   * @param {object} options - grunt options provided to the plugin
@@ -124,8 +127,9 @@ module.exports = function (grunt) {
   grunt.registerMultiTask('ncftp_push', 'Transfer files using FTP.', function() {
 
     var files,
-        command;
-
+        commands,
+        callback;
+    
     // Merge task-specific and/or target-specific options with these defaults.
     options = this.options({
       //incrementalUpdates: true,
@@ -140,6 +144,7 @@ module.exports = function (grunt) {
 			ncftp: '', // Path to ncftpput
 			debug: false, // Log debug info?
 			debugFile: 'stdout', // file to log debug info to if enabled
+			join: '&&', // How to run the processes when there are multiple files
 			shellOptions: {} // options to pass to the shell task
     });
 
@@ -171,6 +176,9 @@ module.exports = function (grunt) {
 
         // Keep files and directories
         return grunt.file.isFile(filepath) || grunt.file.isDir(filepath);
+      });
+      file.info = file.src.map(function(filepath) {
+      	return {path: filepath, isDir: grunt.file.isDir(filepath)};
       });
     });
 
@@ -219,7 +227,7 @@ module.exports = function (grunt) {
 
     // If there are no files to push, bail now
     if (files && files.length === 0) {
-      console.log(messages.noNewFiles);
+      grunt.log.writeln(messages.noNewFiles);
       done();
     }
 
@@ -242,14 +250,82 @@ module.exports = function (grunt) {
 
     });
 		*/
+    // Let the world know we're running
+    grunt.event.emit('ncftp_start', files);
+    
     // Create the shell command
-    command = utils.createShellCommand(options, files);
+    commands = utils.createShellCommand(options, files);
 
     // run the shell command
-    shellOptions = {command: command, options: options.shellOptions};
+    callback = options.shellOptions.callback;
+    shellOptions = {command: commands.join(options.join), options: options.shellOptions};
+    shellOptions.options.callback = function(err, stdout, stderr, cb) {
+    	grunt.event.emit('ncftp_finish');
+    	if (callback) {
+    		callback(err, stdout, stderr, cb);
+    	} else {
+    		cb(err);
+    	}
+    };
     grunt.config('shell.ncftp', shellOptions);
     grunt.task.run('shell:ncftp');
+    
+    //grunt.event.emit('ncftp_finish');
     done();
+  });
+  
+  grunt.registerTask('ncftp_watch', 'Use with watch to capture file changes', function() {
+  	// Start up the watcher if it hasn't already been started
+  	if (!watcherStarted) {
+      var changedFiles = Object.create(null),
+      	fileFilter = grunt.config.get('ncftp_watch').files;
+	
+	  	grunt.config('ncftp_push.watch.options', this.options());
+	
+	    startNcftp = function() {
+	    	if (!running && Object.keys(changedFiles).length) {
+	    		running = true;
+		  		var files = Object.keys(changedFiles).map(function(file) {
+		  			return {expand: true, src: file};
+		  		});
+		  		grunt.config('ncftp_push.watch.files', files);
+		  		grunt.task.run('ncftp_push:watch');
+	    	} else {
+	    		running = false;
+	    	}
+	    };
+	
+	    grunt.event.on('watch', function(action, filepath) {
+	    	if (fileFilter && grunt.file.isMatch(fileFilter, filepath)) {
+	  	    changedFiles[filepath] = action;
+	  	    if (!running) {
+	  	    	startNcftp();
+	  	    }
+	    	}
+	    });
+	    
+	    grunt.event.on('ncftp_start', function(files) {
+	    	running = true;
+	    	// delete changedFiles that are in this list of files
+	    	Object.keys(changedFiles).forEach(function(filepath) {
+	    		if (utils.arrayContainsFile(files, filepath)) {
+	    			delete changedFiles[filepath];
+	    		}
+	    	});
+	    });
+	    
+	    grunt.event.on('ncftp_finish', function() {
+    		running = false;
+    		startNcftp();
+	    });
+	    
+	    watcherStarted = true;
+  	}
+  	
+  	// In case we were started because files changed, start running
+  	if (!running) {
+  		startNcftp();
+  	}
   });
 
 };

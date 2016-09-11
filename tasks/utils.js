@@ -71,7 +71,8 @@ var utils = {
 
     files.forEach(function (file) {
       // For each src file we have
-      file.src.forEach(function (filepath) {
+      file.info.forEach(function (info) {
+      	filepath = info.path;
         // Make sure the path is normalized
         filepath = path.posix.normalize(filepath);
         // Trim the cwd from the path to prepare it for the destination
@@ -85,11 +86,15 @@ var utils = {
         } else {
           destination = path.posix.join(basePath, destination);
         }
-        // If a files destination is not in the array, add the file, this matched on destination
-        if (!utils.arrayContainsFile(filePaths, destination)) {
+        // Remove the filename from the destination
+        destination = path.posix.dirname(destination);
+        
+        // If a the file src is not in the array, add the file, this matched on source
+        if (!utils.arrayContainsFile(filePaths, filepath)) {
           filePaths.push({
             src: filepath,
-            dest: destination
+            dest: destination,
+            isDir: info.isDir
           });
         }
 
@@ -101,13 +106,13 @@ var utils = {
   },
 
   /**
-  * @description Takes an array and a files destination path { src: '..', dest: '..' } and checks if the array contains it
+  * @description Takes an array and a files source path { src: '..', dest: '..' } and checks if the array contains it
   * @param {object[]} files - Array of FilePath Objects
-  * @param {string} destination - Destination of the File
-  * @return {boolean} whether or not the array of files contained a file with the destination
+  * @param {string} source - Source of the File
+  * @return {boolean} whether or not the array of files contained a file with the same source
   */
-  arrayContainsFile: function (files, destination) {
-    return files.some(function (file) { return file.dest === destination; });
+  arrayContainsFile: function (files, source) {
+    return files.some(function (file) { return file.src === source; });
   },
 
   /**
@@ -117,12 +122,13 @@ var utils = {
    * @return {string} the shell command to run
    */
   createShellCommand: function (options, files) {
-    var command = '';
+    var command = [];
     files.forEach(function(file) {
-      command = command + options.ncftp + 'ncftpput -b -R -m -f ' + options.authFile
+    	if (file.isDir) { var recurse = '-R'} else {recurse = ''}
+      command.push(options.ncftp + 'ncftpput ' + recurse + ' -m -f ' + options.authFile
 				+ ((options.redial) ? ' -r ' + options.redial : '')
 				+ ((options.debug) ? ' -d ' + options.debugFile : '')
-				+ ' ' + file.dest + ' ' + file.src + ';';
+				+ ' ' + file.dest + ' ' + file.src);
     });
     return command;
   }

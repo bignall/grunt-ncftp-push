@@ -21,6 +21,7 @@ module.exports = function(grunt) {
         	ncftp: '', // Path to ncftpput
     			debug: false, // Log debug info?
     			debugFile: 'stdout', // file to log debug info to if enabled
+    			join: '&&', // How to join the commands when there are multiple files
     			shellOptions: {} // options to pass to the shell task
         },
         files: [ // Enable Dynamic Expansion, Src matches are relative to this path, Actual Pattern(s) to match
