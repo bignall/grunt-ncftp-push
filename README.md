@@ -182,6 +182,8 @@ The `ncftp_watch` task should be your last `watch` task. This way it can capture
 
 When you make changes to a file that causes changes to other files to be made by other watch tasks you will typically see the `ncftp_push:watch` task run multiple times.  This is because the event watcher catches the files and queues up an `ncftp_push:watch` task, then more changed files are caught while that task is waiting to be run, so when that `ncftp_push:watch` task finishes another one is queued. More files may be caught after that task is queued so it can happen again. As long as there are changed files in the queue it will queue another task each time the previous one finishes. 
 
+This can also be useful to configure livereload to automatically reload your web page when files are changed. Just add `livereload: true` to the options. Check out the `grunt watch` documentation about configuring and using livereload.
+
 ### Usage Examples
 
 #### Sample .ftpauth file
