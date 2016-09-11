@@ -1,7 +1,7 @@
 {
   "name": "grunt-ncftp-push",
   "description": "Deploy your files to a FTP server using ncftp.",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "homepage": "https://bignall.github.io/grunt-ncftp-push/",
   "author": {
     "name": "Rosina Bignall",
