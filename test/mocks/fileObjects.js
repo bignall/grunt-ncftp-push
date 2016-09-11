@@ -106,19 +106,19 @@ module.exports = {
     'options': [{
 			'authFile': '.ftpauth', // File to get ftp account info from
 			'redial': 3, // Maximum retry attempts
-			'ncftp': '', // Path to ncftpput
+			'ncftpPath': '', // Path to ncftpput
 			'debug': false, // Log debug info?
 			'debugFile': 'stdout', // file to log debug info to if enabled
     }, {
 			'authFile': '.altftpauth', // File to get ftp account info from
 			'redial': 0, // Maximum retry attempts
-			'ncftp': '/bin/', // Path to ncftpput
+			'ncftpPath': '/bin/', // Path to ncftpput
 			'debug': true, // Log debug info?
 			'debugFile': 'stdout', // file to log debug info to if enabled
     }, {
 			'authFile': '.ftpauth', // File to get ftp account info from
 			'redial': 3, // Maximum retry attempts
-			'ncftp': '', // Path to ncftpput
+			'ncftpPath': '', // Path to ncftpput
 			'debug': true, // Log debug info?
 			'debugFile': '/tmp/debug.txt', // file to log debug info to if enabled
     }],
