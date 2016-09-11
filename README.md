@@ -29,13 +29,13 @@ grunt.loadNpmTasks('grunt-ftp-push');
 
 Grunt-ncftp-push adds two grunt taks you can use.
 
-## The "ncftp_push" task
+### The "ncftp_push" task
 
-### Overview
+#### Overview
 
 The ncftp_push task pushes all the files given to it to the ftp server.  Usually you would use this your entire project or parts of your project to the ftp server at once.  
 
-### Usage
+#### Usage
 In your project's Gruntfile, add a section named `ncftp_push` to the data object passed into `grunt.initConfig()`.
 
 ```js
@@ -51,19 +51,19 @@ grunt.initConfig({
 })
 ```
 
-### Options
+#### Options
 
 All options are optional but you'll at least want to specify a destination directory
 otherwise it will go to the root directory
 
-#### dest
+##### dest
 Type: `String`<br>
 Default: `/`<br>
 Required: false
 
 Destination of where you want your files pushed to, relative to the host.
 
-#### srcBase
+##### srcBase
 Type: `String`<br>
 Default: ``<br>
 Required: false
@@ -72,7 +72,7 @@ Base of your source files relative to the project base that you want trimmed
 from the file names prior to uploading them to make the filename correct relative
 to the dest.
 
-#### authFile
+##### authFile
 Type: `String`<br>
 Default: `.ftpauth`<br>
 Required: false
@@ -87,55 +87,55 @@ pass myPassword
 
 Note that spacing is important and lines starting with # and blank lines will be ignored. For more information on this file see the ncftp docs.
 
-#### redial
+##### redial
 Type: `Integer`<br>
 Default: 3<br>
 Required: false 
 
 Maximum number of retry attempts
 
-#### ncftpPath
+##### ncftpPath
 Type: `String`<br>
 Default: ``<br>
 Required: false
 
 Path to the ncftpput command. `` means that the command can be executed without specifying a path. If a path is used it must contain the trailing slash.
 
-#### join
+##### join
 Type: `String`<br>
 Default: `&&`<br>
 Required: false
 
 How to join the commands together when there are multiple files. Options are `&&`, `&`, and `;`. The default is `&&` which means only run the next command if the previous one succeeded. `;` will run the commands sequentially and `&` will run the commands concurrently. Running the commands concurrently is usually not a good idea since most ftp servers have limits on concurrent connections. See the documentation for grunt-shell for more information on these options.
 
-#### shellOptions
+##### shellOptions
 Type: `Object`<br>
 Default: {} <br>
 Required: false
 
 Additional options to pass to the grunt-shell task. See the documents for grunt-shell for more information on the options that can be included.
 
-#### debug
+##### debug
 Type: `Boolean`<br>
 Default: `false`<br>
 Required: false
 
 Enable debug mode for the ncftpput command to allow for verbose messages.  This can be useful if the commands are failing and you can't see why. The entire conversation with the server will be output. See the ncftp documentation for more information.
 
-#### debugFile
+##### debugFile
 Type: `String`<br>
 Default: `stdout`<br>
 Required: false
 
 File to send the debug info to if debug is true. The special string `stdout` means it will be sent to the terminal.
 
-## The "ncftp_watch" task
+### The "ncftp_watch" task
 
-### Overview 
+#### Overview 
 
 The ncftp_watch task is meant to be used with grunt watch. It pushes changed files to the server when the watch event fires.  If one task is already running it will keep track of the changed files and runs another task when the current one is finished.
 
-### Usage
+#### Usage
 In your project's Gruntfile, add a section named `ncftp_watch` to the data object passed into `grunt.initConfig()`. Also add a sub-task that runs `ncftp_watch` to the `watch` task in your grunt config.
 
 ```js
@@ -162,13 +162,13 @@ grunt.initConfig({
 })
 ```
 
-### `ncftp_watch` Options
+#### `ncftp_watch` Options
 
 The `ncftp_watch` task can have all the same options as the `ncftp_push` task.  These options will be used in configuring an `ncftp_push:watch` task and starting it up as needed. 
 
 The files given to this task will be used to match against changed files so that only files that match these patterns are uploaded to the server.
 
-### `watch` `ncftp_watch` Options
+#### `watch` `ncftp_watch` Options
 
 The `ncftp_watch` sub-task of the `watch` task is a typical `watch` task.  
 
@@ -223,7 +223,7 @@ Combine files with the same destination to a single `ncftpput` command.
 This module was originally based on the `grunt-ftp-push` module by Robert Winterbottom and many of the utility functions are the same or very similar but the task code is now very different.
 
 ## Contributing
-Fork the module and clone your repo. Make your changes then make a pull request.
+Fork the repo. Make your changes then make a pull request.
 
 Please add unit tests in the root of the test folder for any new or changed functionality and please try to make sure that `npm test` will pass before submitting a pull request.
 
