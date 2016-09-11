@@ -1,15 +1,22 @@
-# grunt-ftp-push  [![Build Status](https://travis-ci.org/Robert-W/grunt-ftp-push.svg?branch=0.4.0)](https://travis-ci.org/Robert-W/grunt-ftp-push)
+# grunt-ncftp-push  [![Build Status](https://travis-ci.org/bignall/grunt-ncftp-push.svg?branch=0.1.0)](https://travis-ci.org/bignall/grunt-ncftp-push)
 
 > Deploy your files to a FTP server <br>
-> Notice: Currently SFTP is not supported
 
 ## Getting Started
-This plugin requires Grunt `~0.4.1`
+### Requirements
+Grunt `~0.4.5`<br>
+[Ncftp](http://ncftp.com/)
+
+### Optional Requirements
+
+Grunt watch
+
+### Install
 
 If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
 
 ```shell
-npm install grunt-ftp-push --save-dev
+npm install grunt-ncftp-push --save-dev
 ```
 
 Once the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:
@@ -18,33 +25,27 @@ Once the plugin has been installed, it may be enabled inside your Gruntfile with
 grunt.loadNpmTasks('grunt-ftp-push');
 ```
 
-## The "ftp_push" task
+## Usage
+
+Grunt-ncftp-push adds two grunt taks you can use.
+
+## The "ncftp_push" task
 
 ### Overview
-In your project's Gruntfile, add a section named `ftp_push` to the data object passed into `grunt.initConfig()`.
+
+The ncftp_push task pushes all the files given to it to the ftp server.  Usually you would use this your entire project or parts of your project to the ftp server at once.  
+
+### Usage
+In your project's Gruntfile, add a section named `ncftp_push` to the data object passed into `grunt.initConfig()`.
 
 ```js
 grunt.initConfig({
-  ftp_push: {
-    your_target: {
+  ncftp_push: {
+    all: {
       options: {
-		authKey: "serverA",
-    	host: "sample.server.com",
-    	dest: "/html/test/",
-    	port: 21
+        dest: 'distination/directory/on/ftp/server'
       },
-      files: [
-        {
-          expand: true,
-          cwd: '.',
-          src: [
-            ".gitignore",
-            "package.json",
-            "README.md",
-            "test/**"
-          ]
-        }
-      ]
+      files: [{expand: true, src: ['trunk/*', '!trunk/composer*']}]
     }
   }
 })
@@ -52,153 +53,183 @@ grunt.initConfig({
 
 ### Options
 
-#### authKey
-Type: `String`<br>
-Default: `None`<br>
-Required: false
-
-Name of authKey that will be used for your credentials to access the FTP server.  This name should match the name of the credentials you want to use in the `.ftpauth` file.
-
-#### host
-Type: `String`<br>
-Default: `None`<br>
-Required: true
-
-URL host of your FTP Server.
+All options are optional but you'll at least want to specify a destination directory
+otherwise it will go to the root directory
 
 #### dest
 Type: `String`<br>
-Default: `None`<br>
-Required: true
+Default: `/`<br>
+Required: false
 
 Destination of where you want your files pushed to, relative to the host.
 
-#### port
-Type: `Number`<br>
-Default: `21`<br>
-Required: false
-
-Port for accessing the FTP server.
-
-#### username
+#### srcBase
 Type: `String`<br>
-Default: `None`<br>
+Default: ``<br>
 Required: false
 
-If no authKey and .ftpauth file is provided, you can specify username here.
+Base of your source files relative to the project base that you want trimmed
+from the file names prior to uploading them to make the filename correct relative
+to the dest.
 
-#### password
+#### authFile
 Type: `String`<br>
-Default: `None`<br>
+Default: `.ftpauth`<br>
 Required: false
 
-If no authKey and .ftpauth file is provided, you can specify password here.
+File to get the destination host and authorization credentials from. Default filename is `.ftpauth`.  File should be in the following format:
 
-#### keepAlive
-Type: `Number`<br>
-Default: `60000`<br>
+```txt
+host my.hostname.com
+user myUsername
+pass myPassword
+```
+
+Note that spacing is important and lines starting with # and blank lines will be ignored. For more information on this file see the ncftp docs.
+
+#### redial
+Type: `Integer`<br>
+Default: 3<br>
+Required: false 
+
+Maximum number of retry attempts
+
+#### ncftpPath
+Type: `String`<br>
+Default: ``<br>
 Required: false
 
-Duration of JSFTP's keep alive to avoid session timeouts.
+Path to the ncftpput command. `` means that the command can be executed without specifying a path. If a path is used it must contain the trailing slash.
+
+#### join
+Type: `String`<br>
+Default: `&&`<br>
+Required: false
+
+How to join the commands together when there are multiple files. Options are `&&`, `&`, and `;`. The default is `&&` which means only run the next command if the previous one succeeded. `;` will run the commands sequentially and `&` will run the commands concurrently. Running the commands concurrently is usually not a good idea since most ftp servers have limits on concurrent connections. See the documentation for grunt-shell for more information on these options.
+
+#### shellOptions
+Type: `Object`<br>
+Default: {} <br>
+Required: false
+
+Additional options to pass to the grunt-shell task. See the documents for grunt-shell for more information on the options that can be included.
 
 #### debug
 Type: `Boolean`<br>
 Default: `false`<br>
 Required: false
 
-Enable debug mode for the JSFTP module to allow for verbose console messages.
+Enable debug mode for the ncftpput command to allow for verbose messages.  This can be useful if the commands are failing and you can't see why. The entire conversation with the server will be output. See the ncftp documentation for more information.
 
-#### incrementalUpdates
-Type: `Boolean`<br>
-Default: `true`<br>
+#### debugFile
+Type: `String`<br>
+Default: `stdout`<br>
 Required: false
 
-Allows for files to be incrementally pushed based on their modified times.
+File to send the debug info to if debug is true. The special string `stdout` means it will be sent to the terminal.
 
-#### hideCredentials
-Type: `Boolean`<br>
-Default: `true`<br>
-Required: false
+## The "ncftp_watch" task
 
-Does not show credentials in the console output. NOTE: debug mode runs jsftp in debug mode and this has no affect on that.
+### Overview 
+
+The ncftp_watch task is meant to be used with grunt watch. It pushes changed files to the server when the watch event fires.  If one task is already running it will keep track of the changed files and runs another task when the current one is finished.
+
+### Usage
+In your project's Gruntfile, add a section named `ncftp_watch` to the data object passed into `grunt.initConfig()`. Also add a sub-task that runs `ncftp_watch` to the `watch` task in your grunt config.
+
+```js
+grunt.initConfig({
+  watch: {
+    ncftp_watch: {
+      files: [ 'trunk/**/*', '!trunk/composer*'],
+      tasks: ['ncftp_watch'],
+      options: {
+        atBegin: true,
+        spawn: false,
+        debounceDelay: 500
+      }
+    }
+  },
+  ncftp_watch: {
+      options: {
+        dest: 'wp-content/plugins/credit-helper-elite',
+        srcBase: 'trunk/'
+      },
+      files: ['trunk/**', '!trunk/composer*']
+    }
+  }
+})
+```
+
+### `ncftp_watch` Options
+
+The `ncftp_watch` task can have all the same options as the `ncftp_push` task.  These options will be used in configuring an `ncftp_push:watch` task and starting it up as needed. 
+
+The files given to this task will be used to match against changed files so that only files that match these patterns are uploaded to the server.
+
+### `watch` `ncftp_watch` Options
+
+The `ncftp_watch` sub-task of the `watch` task is a typical `watch` task.  
+
+You should include `atBegin: true` so that the `ncftp_watch` command runs when `grunt watch` first starts up. This sets up the watchers to catch the changed files and keep track of whether the `ncftp_push:watch` task is queued, and start it up if there are already changed files (there shouldn't be at this point, so the `ncftp_push:watch` task won't start at this point). If you don't set `atBegin` to true the watchers will start up the first time the `ncftp_watch` task is run, but it will miss any changed files that came before that run. 
+
+`spawn` must be set to false. The `ncftp_watch` task must run in the same process as the `watch` task so that it can capture `watch` events and internal `ncftp_start` and `ncftp_finish` events emmitted by the `ncftp_push` task. 
+
+`debounceDelay` can be set to whatever works for you but the default `500` seems to work well (so it can technically be left off).
+
+The `ncftp_watch` task should be your last `watch` task. This way it can capture all changed files that came before it an run an additional `ncftp_push:watch` task if there are any remaining changed files that haven't been pushed to the server yet when it runs (usually the watchers will have taken care of this so it won't start at this point).  
+
+When you make changes to a file that causes changes to other files to be made by other watch tasks you will typically see the `ncftp_push:watch` task run multiple times.  This is because the event watcher catches the files and queues up an `ncftp_push:watch` task, then more changed files are caught while that task is waiting to be run, so when that `ncftp_push:watch` task finishes another one is queued. More files may be caught after that task is queued so it can happen again. As long as there are changed files in the queue it will queue another task each time the previous one finishes. 
 
 ### Usage Examples
 
 #### Sample .ftpauth file
 
-This file should be named `.ftpauth` and be in the same directory as your `Gruntfile.js`.  It is a JSON object with an "authKey" that has a username and password for it's value. Use the following as a guide for setting up your file.
+This file default name is `.ftpauth` and is in the same directory as your `Gruntfile.js`.  You should add this file to your `.gitignore` so that it is not uploaded to your git repository or specify another file that is not in your project path.
 
-```js
-{
-	"serverA":{
-		"username":"myUserName@gmail.com",
-		"password":"password123456"
-	},
-	"serverB":{
-  		"username":"myOtherUsername@gmail.com",
-  		"password":"12345Pass"
-  	}
-}
+The format of this file is specified by `ncftp` and more documentation on it can be found in the `ncftp` docs. It contains the hostname, username and password for the destination ftp server.
+
+```txt
+host my.hostname.com
+user myUsername
+pass myPassword
 ```
 
-#### Required Options
-Currently the `host` and `dest` options are the only two required for this plugin to function correctly.  If any of the required options are omitted, the plugin will abort with a warning informing you that you did not specify all the necessary requirements.
-
-#### Optional Options
-In your options, you may choose not to set up an .ftpauth file and not have an authKey present in your options.  You will probably then need to specify the username and password in the options object instead.  If you don't, the plugin will attempt to use an anonymous login.
-
-Specifying the username and password within the options object would look like the following:
-```js
-options: {
-	username: "myUsername",
-	password: "myPassword",
-    host: "sample.server.com",
-    dest: "/html/test/",
-    port: 21
-}
-```
 #### Extras
-You can now specify a destination inside your files objects like so:
+You can specify a destination inside your files objects like so:
 ```js
 {expand: true,cwd: 'test',src: ['**/*']},
 {expand: true,cwd: 'tasks',src: ['**/*'], dest: 'test/' }
 ```
 This will allow you to configure where you push your code in case you want to push to a diretory structure that is different from your local one.  The dest here <strong>MUST</strong> be relative to the root destination.
 
-## Dependencies
-This plugin uses Sergi Mansilla's <a href="https://github.com/sergi/jsftp">jsftp</a> node.js module.
+Source files can be individual files or they can be directories. Directories will be pushed recursively so all files and other directories within that directory will be pushed to the destination.  So if you want to include an entire directory to upload do it like so:
 
-## Coming Soon
-Adding in Unit Tests for my sanity<br>
-More Examples in the README to show different ways of using it<br>
-Possibly adding in support for SFTP
+```js
+{expand: true, src: ['mydirectory']}
+```
+
+This works only for the `ncftp_push` task. The `ncftp_watch` task can only have one destination since files come from the `watch` events.
+
+
+## Dependencies
+This plugin uses Sindre Sorhus [`grunt-shell`](https://github.com/sindresorhus/grunt-shell) module.
+
+## To do
+Combine files with the same destination to a single `ncftpput` command.
+
+## Acknowledgements
+This module was originally based on the `grunt-ftp-push` module by Robert Winterbottom and many of the utility functions are the same or very similar but the task code is now very different.
 
 ## Contributing
+Fork the module and clone your repo. Make your changes then make a pull request.
+
 Please add unit tests in the root of the test folder for any new or changed functionality and please try to make sure that `npm test` will pass before submitting a pull request.
+
+Thanks for contributing!
 
 ## Release History
 <ul>
-<li>2016/07/07 - v 1.1.0 New feature, added incremental updates.</li>
-<li>2016/03/28 - v 1.0.0 Updated release version to 1.0.0 since this has been stable for a little while.</li>
-<li>2016/01/13 - v 0.4.4 Added code similar to PR [#41 Hide Credentials](https://github.com/Robert-W/grunt-ftp-push/pull/41) as a way to hide username in output for CI.</li>
-<li>2015/09/24 - v 0.4.3 Merged updates from [#36 - Use path.posix for ftp paths](https://github.com/Robert-W/grunt-ftp-push/pull/36) for path operations not already using posix.</li>
-<li>2015/09/03 - v 0.4.2 Using path.posix instead of just path, updated tasks to pass linting, added local ftp-server for more testing.</li>
-<li>2015/09/03 - v 0.4.1 Swapped out jest for mocha and chai due to windows compatibility issues.</li>
-<li>2015/09/03 - v 0.4.0 Several minor bug fixes, added unit tests, code cleanup, and now using nodes path module.</li>
-<li>2015/06/25 - v 0.3.6 Merged updates from [#25 - De-Duplicate destination directories](https://github.com/Robert-W/grunt-ftp-push/pull/25) </li>
-<li>2015/05/20 - v 0.3.4 Merged fix for empty folder structure being created. [#24](https://github.com/Robert-W/grunt-ftp-push/pull/24) </li>
-<li>2015/01/15 - v 0.3.2  Added debug option, updated readme, updated jsftp to 1.3.9</li>
-<li>2015/01/13 - v 0.3.0  Minor typo caused patch to work incorrectly</li>
-<li>2015/01/13 - v 0.2.8  Patch for deeply nested files throwing errors</li>
-<li>2014/12/22 - v 0.2.6  Added in option for keepAlive, default is 60000 (60 seconds), added in option for multiple destinations specified for each file object provided, if no dest is provided, it defaults to the dest specified in the options [#4](https://github.com/Robert-W/grunt-ftp-push/issues/4) & [#13](https://github.com/Robert-W/grunt-ftp-push/issues/13)
-</li>
-<li>2014/07/24 - v 0.2.4  Fixed issue introduced with latest fix, added fix to remove cwd from path of file being pushed so they are pushed to the expected location.  Other minor fixes and enhancements.
-</li>
-<li>2014/07/20 - v 0.2.2
-<ul>
-<li>Fixes for getting credentials correctly.</li><li>Creating directories correctly from dest if they don't exist.</li><li>Handling '/' appropriately in all cases.</li><li>Better error handling, restructured code, and more detailed comments.</li><li>Upgraded to latest jsftp(v 1.3.1). [#8](https://github.com/Robert-W/grunt-ftp-push/issues/8) </li><li>Updated documentation for username and password.</li>
-</ul>
-</li>
-<li>2014/07/10 - v 0.2.1 Fixed issue from latest patch where it was not correctly creating directories in provided filepaths from patterns. As well as [#7](https://github.com/Robert-W/grunt-ftp-push/issues/7) & [#9](https://github.com/Robert-W/grunt-ftp-push/issues/9)&nbsp;</li>
-<li>2014/07/03 - v 0.2.0 &nbsp;[#6](https://github.com/Robert-W/grunt-ftp-push/issues/6)&nbsp; Fixed issue with pushing files from root directory when cwd is set to '.' or './'</li>
+<li>2016/09/11 Initial release
 </ul>

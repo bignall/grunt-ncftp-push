@@ -28,11 +28,11 @@ module.exports = function (grunt) {
 
     // Merge task-specific and/or target-specific options with these defaults.
     options = this.options({
-      dest: '', // Destination directory on server
+      dest: '/', // Destination directory on server
       srcBase: '', // Source base to trim from files
       authFile: '.ftpauth', // File to get ftp account info from
       redial: 3, // Maximum retry attempts
-      ncftp: '', // Path to ncftpput
+      ncftpPath: '', // Path to ncftpput
       debug: false, // Log debug info?
       debugFile: 'stdout', // file to log debug info to if enabled
       join: '&&', // How to run the processes when there are multiple files

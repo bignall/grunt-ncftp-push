@@ -95,7 +95,7 @@ var utils = {
     var command = [];
     files.forEach(function(file) {
       var recurse = (file.isDir) ? '-R' : '';
-      command.push(options.ncftp + 'ncftpput ' + recurse
+      command.push(options.ncftpPath + 'ncftpput ' + recurse
         + ' -m -f ' + options.authFile
         + ((options.redial) ? ' -r ' + options.redial : '')
         + ((options.debug) ? ' -d ' + options.debugFile : '')
