@@ -214,6 +214,8 @@ Source files can be individual files or they can be directories. Directories wil
 
 This works only for the `ncftp_push` task. The `ncftp_watch` task can only have one destination since files come from the `watch` events.
 
+### Notes
+The output from `ncftpput` appears in the terminal twice. I don't believe the commands are being run twice it's just output twice. It has something to do with `grunt-shell`. I welcome any suggestions for how to solve it but for now it will just be there twice.
 
 ## Dependencies
 This plugin uses Sindre Sorhus [`grunt-shell`](https://github.com/sindresorhus/grunt-shell) module.
