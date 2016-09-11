@@ -7,7 +7,7 @@
 Grunt `~0.4.5`<br>
 [Ncftp](http://ncftp.com/)
 
-### Optional Requirements
+#### Optional Requirements
 
 Grunt watch
 
@@ -33,7 +33,7 @@ Grunt-ncftp-push adds two grunt taks you can use.
 
 #### Overview
 
-The ncftp_push task pushes all the files given to it to the ftp server.  Usually you would use this your entire project or parts of your project to the ftp server at once.  
+The `ncftp_push` task pushes all the files given to it to the ftp server.  Usually you would use this to upload your entire project or parts of your project to the ftp server at once.  
 
 #### Usage
 In your project's Gruntfile, add a section named `ncftp_push` to the data object passed into `grunt.initConfig()`.
@@ -43,7 +43,7 @@ grunt.initConfig({
   ncftp_push: {
     all: {
       options: {
-        dest: 'distination/directory/on/ftp/server'
+        dest: 'destination/directory/on/ftp/server'
       },
       files: [{expand: true, src: ['trunk/*', '!trunk/composer*']}]
     }
@@ -54,7 +54,7 @@ grunt.initConfig({
 #### Options
 
 All options are optional but you'll at least want to specify a destination directory
-otherwise it will go to the root directory
+otherwise it will go to the root directory of the ftp account.
 
 ##### dest
 Type: `String`<br>
@@ -133,10 +133,10 @@ File to send the debug info to if debug is true. The special string `stdout` mea
 
 #### Overview 
 
-The ncftp_watch task is meant to be used with grunt watch. It pushes changed files to the server when the watch event fires.  If one task is already running it will keep track of the changed files and runs another task when the current one is finished.
+The `ncftp_watch` task is meant to be used with `grunt watch`. It pushes changed files to the server when the `watch` event fires.  If one task is already running it will keep track of the changed files and run another task when the current one is finished.
 
 #### Usage
-In your project's Gruntfile, add a section named `ncftp_watch` to the data object passed into `grunt.initConfig()`. Also add a sub-task that runs `ncftp_watch` to the `watch` task in your grunt config.
+In your project's Gruntfile, add a section named `ncftp_watch` to the data object passed into `grunt.initConfig()`. Also add a sub-task to the `watch` task in your grunt config that runs the `ncftp_watch` task.
 
 ```js
 grunt.initConfig({
@@ -164,7 +164,7 @@ grunt.initConfig({
 
 #### `ncftp_watch` Options
 
-The `ncftp_watch` task can have all the same options as the `ncftp_push` task.  These options will be used in configuring an `ncftp_push:watch` task and starting it up as needed. 
+The `ncftp_watch` task can have all the same options as the `ncftp_push` task.  These options will be used in configuring an `ncftp_push:watch` task which will be started up as needed. 
 
 The files given to this task will be used to match against changed files so that only files that match these patterns are uploaded to the server.
 
@@ -172,13 +172,13 @@ The files given to this task will be used to match against changed files so that
 
 The `ncftp_watch` sub-task of the `watch` task is a typical `watch` task.  
 
-You should include `atBegin: true` so that the `ncftp_watch` command runs when `grunt watch` first starts up. This sets up the watchers to catch the changed files and keep track of whether the `ncftp_push:watch` task is queued, and start it up if there are already changed files (there shouldn't be at this point, so the `ncftp_push:watch` task won't start at this point). If you don't set `atBegin` to true the watchers will start up the first time the `ncftp_watch` task is run, but it will miss any changed files that came before that run. 
+You should include `atBegin: true` so that the `ncftp_watch` command runs when `grunt watch` first starts up. This sets up the watchers to catch the changed files and keep track of whether the `ncftp_push:watch` task is queued, and start it up if there are already changed files (there shouldn't be at this point, so the `ncftp_push:watch` task won't run at this point). If you don't set `atBegin` to true the watchers will start up the first time the `ncftp_watch` task is run, but any changed files that came before that run will not be uploaded. 
 
 `spawn` must be set to false. The `ncftp_watch` task must run in the same process as the `watch` task so that it can capture `watch` events and internal `ncftp_start` and `ncftp_finish` events emmitted by the `ncftp_push` task. 
 
 `debounceDelay` can be set to whatever works for you but the default `500` seems to work well (so it can technically be left off).
 
-The `ncftp_watch` task should be your last `watch` task. This way it can capture all changed files that came before it an run an additional `ncftp_push:watch` task if there are any remaining changed files that haven't been pushed to the server yet when it runs (usually the watchers will have taken care of this so it won't start at this point).  
+The `ncftp_watch` task should be your last `watch` task. This way it can capture all changed files from tasks that came before it and run an additional `ncftp_push:watch` task if there are any remaining changed files that haven't been pushed to the server yet when it runs (usually the watchers will have taken care of this so it won't start at this point).  
 
 When you make changes to a file that causes changes to other files to be made by other watch tasks you will typically see the `ncftp_push:watch` task run multiple times.  This is because the event watcher catches the files and queues up an `ncftp_push:watch` task, then more changed files are caught while that task is waiting to be run, so when that `ncftp_push:watch` task finishes another one is queued. More files may be caught after that task is queued so it can happen again. As long as there are changed files in the queue it will queue another task each time the previous one finishes. 
 
@@ -186,7 +186,7 @@ When you make changes to a file that causes changes to other files to be made by
 
 #### Sample .ftpauth file
 
-This file default name is `.ftpauth` and is in the same directory as your `Gruntfile.js`.  You should add this file to your `.gitignore` so that it is not uploaded to your git repository or specify another file that is not in your project path.
+This file's default name is `.ftpauth` and is in the same directory as your `Gruntfile.js`.  You should add this file to your `.gitignore` so that it is not uploaded to your git repository or specify another file that is not in your project path.
 
 The format of this file is specified by `ncftp` and more documentation on it can be found in the `ncftp` docs. It contains the hostname, username and password for the destination ftp server.
 
@@ -223,7 +223,7 @@ Combine files with the same destination to a single `ncftpput` command.
 This module was originally based on the `grunt-ftp-push` module by Robert Winterbottom and many of the utility functions are the same or very similar but the task code is now very different.
 
 ## Contributing
-Fork the repo. Make your changes then make a pull request.
+Fork the repo. Make your changes then submit a pull request.
 
 Please add unit tests in the root of the test folder for any new or changed functionality and please try to make sure that `npm test` will pass before submitting a pull request.
 
