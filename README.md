@@ -1,4 +1,4 @@
-# grunt-ncftp-push  [![Build Status](https://travis-ci.org/bignall/grunt-ncftp-push.svg?branch=grunt-ncftp-push-0.1.0)](https://travis-ci.org/bignall/grunt-ncftp-push)
+# grunt-ncftp-push  [![Build Status](https://travis-ci.org/bignall/grunt-ncftp-push.svg?branch=grunt-ncftp-push-0.1.0)](https://travis-ci.org/bignall/grunt-ncftp-push)[![Analytics](https://ga-beacon.appspot.com/UA-44748521-8/grunt-ncftp-push/readme)](https://github.com/igrigorik/ga-beacon)
 
 > Deploy your files to a FTP server <br>
 
