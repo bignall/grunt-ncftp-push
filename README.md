@@ -11,7 +11,7 @@ Grunt `~0.4.5`<br>
 
 Grunt watch
 
-[![NPM](https://nodei.co/npm/grunt-ncftp-push.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/grunt-ncftp-push/)
+[![NPM](https://nodei.co/npm/grunt-ncftp-push.png?downloads=true&stars=true)](https://nodei.co/npm/grunt-ncftp-push/)
 
 ### Install
 
