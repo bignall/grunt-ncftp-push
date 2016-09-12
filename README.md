@@ -1,4 +1,4 @@
-# grunt-ncftp-push [![NPM version][npm-image]][npm-url] [![Build status][travis-image]][travis-url] [![Test coverage][coveralls-image]][coveralls-url] [![License][license-image]][license-url] [![Build Status](https://travis-ci.org/bignall/grunt-ncftp-push.svg?branch=grunt-ncftp-push-0.1.0)](https://travis-ci.org/bignall/grunt-ncftp-push) [![Analytics](https://ga-beacon.appspot.com/UA-44748521-8/grunt-ncftp-push/readme)](https://github.com/igrigorik/ga-beacon)
+# grunt-ncftp-push [![NPM version][npm-image]][npm-url] [![Build status][travis-image]][travis-url] [![Test coverage][coveralls-image]][coveralls-url] [![License][license-image]][license-url] [![Build Status](https://travis-ci.org/bignall/grunt-ncftp-push.svg?branch=master)](https://travis-ci.org/bignall/grunt-ncftp-push) [![npm version](https://badge.fury.io/js/grunt-ncftp-push.png)](https://badge.fury.io/js/grunt-ncftp-push)  [![Analytics](https://ga-beacon.appspot.com/UA-44748521-8/grunt-ncftp-push/readme)](https://github.com/igrigorik/ga-beacon)
 
 > Deploy your files to a FTP server <br>
 
