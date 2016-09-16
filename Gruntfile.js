@@ -4,6 +4,8 @@
  *
  * Copyright (c) 2016 Rosina Bignall
  * Licensed under the MIT license.
+ * 
+ * Description: Sample Gruntfile
  */
 
 module.exports = function(grunt) {
@@ -62,9 +64,8 @@ module.exports = function(grunt) {
             interrupt: true,
             debounceDelay: 500
         }
-
+      }
     }
-
   });
 
   // Actually load this plugin's task(s).
@@ -74,4 +75,4 @@ module.exports = function(grunt) {
   grunt.registerTask('sample', ['ncftp_push:sample']);
   grunt.registerTask('local', ['ncftp_push:local']);
 
-};
+}

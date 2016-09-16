@@ -60,12 +60,18 @@ var utils = {
         destination = path.posix.dirname(destination);
 
         // If a the file src is not in the array, add the file, this matched on source
-        if (!utils.arrayContainsFile(filePaths, filepath)) {
-          filePaths.push({
-            src: filepath,
-            dest: destination,
-            isDir: info.isDir
-          });
+        if (!utils.arrayContainsSrcFile(filePaths, filepath)) {
+          var filePath = utils.getPathWithDest(filePaths, destination);
+          if (filePath) {
+            filePath.src.push(filepath);
+            filePath.isDir = info.isDir || filePath.isDir;
+          } else {
+            filePaths.push({
+              src: [filepath],
+              dest: destination,
+              isDir: info.isDir
+            });
+          }
         }
 
       }); // Inner for-each
@@ -76,13 +82,23 @@ var utils = {
   },
 
   /**
-  * @description Takes an array and a files source path { src: '..', dest: '..' } and checks if the array contains it
+  * @description Takes an array [{src: ['..'], dest: "..", isDir: boolean} and a files source path and checks if the array contains it
   * @param {object[]} files - Array of FilePath Objects
   * @param {string} source - Source of the File
   * @return {boolean} whether or not the array of files contained a file with the same source
   */
-  arrayContainsFile: function (files, source) {
-    return files.some(function (file) { return file.src === source; });
+  arrayContainsSrcFile: function (files, source) {
+    return files.some(function (file) { return file.src.indexOf(source) !== -1; });
+  },
+
+  /**
+   * @description Takes an array of filePaths and a destination path and returns the element containing it or undefined
+   * @param {object[]} files - Array of FilePath objects
+   * @param {string} destination - Destination path
+   * return {object|undefined} element in the array containing the destination or undefined
+   */
+  getPathWithDest: function (files, destination) {
+    return files.find(function(file) { return file.dest === destination; });
   },
 
   /**
@@ -99,7 +115,7 @@ var utils = {
         + ' -m -f ' + options.authFile
         + ((options.redial) ? ' -r ' + options.redial : '')
         + ((options.debug) ? ' -d ' + options.debugFile : '')
-        + ' ' + file.dest + ' ' + file.src);
+        + ' ' + file.dest + ' ' + file.src.join(' '));
     });
     return command;
   }

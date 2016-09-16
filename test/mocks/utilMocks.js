@@ -30,17 +30,19 @@ module.exports = {
   },
   arrayMatch: {
     files: [{
-      'src': 'test/files/Test.txt',
+      'src': ['test/files/Test.txt', 'test/files/Test2.txt'],
       'dest': '/html/test/files/Test.txt'
     }, {
-      'src': 'test/files/js/alert.js',
+      'src': ['test/files/js/alert.js'],
       'dest': '/html/test/files/js/alert.js'
     }, {
-      'src': 'tasks/utils.js',
+      'src': ['tasks/utils.js'],
       'dest': '/html/test/test/utils.js'
     }],
     uniqueSrc: 'test/files/js/console.js',
-    duplicateSrc: 'test/files/Test.txt'
+    duplicateSrc: 'test/files/Test.txt',
+    uniqueDest: '/html/test/files/DoesNotExist.txt',
+    duplicateDest: '/html/test/test/utils.js'
   },
   /*
     We should never encounter bad filepaths like this, but just in case, lets make sure we can handle it.

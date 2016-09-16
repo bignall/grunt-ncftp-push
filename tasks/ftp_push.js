@@ -137,10 +137,12 @@ module.exports = function (grunt) {
         if (fileFilter && grunt.file.isMatch(fileFilter, filepath))
         {
           changedFiles[filepath] = action;
+          /*
           if (!running)
           {
             startNcftp();
           }
+          */
         }
       });
 
@@ -154,7 +156,8 @@ module.exports = function (grunt) {
       });
 
       grunt.event.on('ncftp_finish', function() {
-        running = false; startNcftp();
+        running = false;
+        startNcftp();
       });
 
       watcherStarted = true;

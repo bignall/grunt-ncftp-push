@@ -35,6 +35,37 @@ describe('ncftp_push - utils.trimCwd', function () {
 
 });
 
+describe('ncftp_push - utils.arrayContainsSrcFile', function () {
+  'use strict';
+
+  it('should return true when passed a souce and an array of files containing that source', function () {
+    expect(utils.arrayContainsSrcFile(mocks.arrayMatch.files, mocks.arrayMatch.duplicateSrc)).to.be.true;
+  });
+
+  it('should return false when passed a source and an array of files that does not have that source', function () {
+    expect(utils.arrayContainsSrcFile(mocks.arrayMatch.files, mocks.arrayMatch.uniqueSrc)).to.be.false;
+  });
+
+});
+
+describe('ncftp_push - utils.getPathWithDest', function () {
+  'use strict';
+
+  it('should return a filePath object when the destination is contained in the array', function () {
+    var file = mocks.arrayMatch.duplicateDest;
+    var expected = mocks.arrayMatch.files[2];
+    var result = utils.getPathWithDest(mocks.arrayMatch.files, file);
+    expect(result).to.equal(expected);
+  });
+
+  it('should return undefined when the destination is not contained in the array', function () {
+    var file = mocks.arrayMatch.uniqueDest;
+    var result = utils.getPathWithDest(mocks.arrayMatch.files, file);
+    expect(result).to.not.exist;
+  });
+});
+
+
 describe('ncftp_push - utils.getFilePaths', function () {
   'use strict';
 
@@ -45,15 +76,16 @@ describe('ncftp_push - utils.getFilePaths', function () {
       expect(file.src).to.exist;
       expect(file.dest).to.exist;
       expect(file.isDir).to.exist;
-      expect(utils.arrayContainsFile(fileMocks.test.paths, file.src)).to.be.true;
+      file.src.forEach(function (src){
+        expect(utils.arrayContainsSrcFile(fileMocks.test.paths, src)).to.be.true;
+      });
     });
   });
 
   it('should accomodate relative destinations specified at the file level to be included in paths', function () {
     var file = fileMocks.test.files[4];
-    var expected = fileMocks.test.paths[4];
+    var expected = fileMocks.test.relativeDestResult;
     var result = utils.getFilePaths(fileMocks.test.base, '', [file])[0];
-
     expect(result.dest).to.equal(expected.dest);
     expect(result.dest).to.not.equal(expected.badPath);
   });
@@ -87,19 +119,6 @@ describe('ncftp_push - utils.getFilePaths', function () {
 		var result = utils.getFilePaths(fileMocks.test.base, fileMocks.test.srcBase, [file]);
 		expect(result.length).to.equal(1);
 		expect(result[0].dest).to.equal(expected.dest);
-  });
-
-});
-
-describe('ncftp_push - utils.arrayContainsFile', function () {
-  'use strict';
-
-  it('should return true when passed a destination and an array of files containing that destination', function () {
-    expect(utils.arrayContainsFile(mocks.arrayMatch.files, mocks.arrayMatch.duplicateSrc)).to.be.true;
-  });
-
-  it('should return false when passed a destination and an array of files that does not have that destination', function () {
-    expect(utils.arrayContainsFile(mocks.arrayMatch.files, mocks.arrayMatch.uniqueSrc)).to.be.false;
   });
 
 });
@@ -139,6 +158,13 @@ describe('ncftp_push - utils.createShellCommand', function () {
   it('should use -R when directory is used', function () {
     var expected = fileMocks.test.command[4];
     var results = utils.createShellCommand(fileMocks.test.options[0], [fileMocks.test.dirFileResult]);
+    expect(results.length).to.equal(expected.length);
+    expect(results[0]).to.equal(expected[0]);
+  });
+
+  it('should use specify multiple files when multiple src files are defined', function () {
+    var expected = fileMocks.test.command[5];
+    var results = utils.createShellCommand(fileMocks.test.options[0], [fileMocks.test.multipleSrcFileResult]);
     expect(results.length).to.equal(expected.length);
     expect(results[0]).to.equal(expected[0]);
   });
