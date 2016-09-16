@@ -137,12 +137,6 @@ module.exports = function (grunt) {
         if (fileFilter && grunt.file.isMatch(fileFilter, filepath))
         {
           changedFiles[filepath] = action;
-          /*
-          if (!running)
-          {
-            startNcftp();
-          }
-          */
         }
       });
 
