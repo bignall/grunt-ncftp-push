@@ -149,7 +149,7 @@ module.exports = function (grunt) {
       grunt.event.on('ncftp_start', function(files) {
         running = true;
         Object.keys(changedFiles).forEach(function(filepath) {
-          if (utils.arrayContainsFile(files, filepath)) {
+          if (utils.arrayContainsSrcFile(files, filepath)) {
             delete changedFiles[filepath];
           }
         });
