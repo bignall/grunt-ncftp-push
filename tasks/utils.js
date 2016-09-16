@@ -98,7 +98,7 @@ var utils = {
    * return {object|undefined} element in the array containing the destination or undefined
    */
   getPathWithDest: function (files, destination) {
-    console.log(files,destination);
+    console.log(files, destination);
     return files.find(function(file) { return file.dest === destination; });
   },
 
