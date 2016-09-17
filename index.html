@@ -20,7 +20,7 @@
 
     <section class="main-content">
       <h1>
-<a id="grunt-ncftp-push--" class="anchor" href="#grunt-ncftp-push--" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>grunt-ncftp-push  <a href="https://travis-ci.org/bignall/grunt-ncftp-push"><img src="https://travis-ci.org/bignall/grunt-ncftp-push.svg?branch=grunt-ncftp-push-0.1.0" alt="Build Status"></a>
+<a id="grunt-ncftp-push------" class="anchor" href="#grunt-ncftp-push------" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>grunt-ncftp-push <a href="https://badge.fury.io/js/grunt-ncftp-push"><img src="https://badge.fury.io/js/grunt-ncftp-push.png" alt="NPM version"></a> <a href="https://travis-ci.org/bignall/grunt-ncftp-push"><img src="https://travis-ci.org/bignall/grunt-ncftp-push.svg?branch=master" alt="Build Status"></a> <a href="https://coveralls.io/github/bignall/grunt-ncftp-push?branch=master"><img src="https://coveralls.io/repos/github/bignall/grunt-ncftp-push/badge.svg?branch=master" alt="Coverage Status"></a>  <a href="https://github.com/igrigorik/ga-beacon"><img src="https://ga-beacon.appspot.com/UA-44748521-8/grunt-ncftp-push/readme" alt="Analytics"></a> <a href="LICENSE"><img src="https://img.shields.io/npm/l/grunt-ncftp-push.svg?style=plastic" alt="License"></a>
 </h1>
 
 <blockquote>
@@ -40,6 +40,8 @@
 <a id="optional-requirements" class="anchor" href="#optional-requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Optional Requirements</h4>
 
 <p>Grunt watch</p>
+
+<p><a href="https://nodei.co/npm/grunt-ncftp-push/"><img src="https://nodei.co/npm/grunt-ncftp-push.png?downloads=true&amp;stars=true" alt="NPM"></a></p>
 
 <h3>
 <a id="install" class="anchor" href="#install" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install</h3>
@@ -183,7 +185,7 @@ Required: false</p>
 <h4>
 <a id="overview-1" class="anchor" href="#overview-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Overview</h4>
 
-<p>The <code>ncftp_watch</code> task is meant to be used with <code>grunt watch</code>. It pushes changed files to the server when the <code>watch</code> event fires.  If one task is already running it will keep track of the changed files and run another task when the current one is finished.</p>
+<p>The <code>ncftp_watch</code> task is meant to be used with <code>grunt watch</code>. It starts up some a watcher to capture and queue up changed files when the <code>watch</code> event fires.  When there are changed files in the queue it starts the <code>ncfp_push:watch</code> task to push those files to the server.</p>
 
 <h4>
 <a id="usage-2" class="anchor" href="#usage-2" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h4>
@@ -224,17 +226,17 @@ Required: false</p>
 
 <p>The <code>ncftp_watch</code> sub-task of the <code>watch</code> task is a typical <code>watch</code> task.  </p>
 
-<p>You should include <code>atBegin: true</code> so that the <code>ncftp_watch</code> command runs when <code>grunt watch</code> first starts up. This sets up the watchers to catch the changed files and keep track of whether the <code>ncftp_push:watch</code> task is queued, and start it up if there are already changed files (there shouldn't be at this point, so the <code>ncftp_push:watch</code> task won't run at this point). If you don't set <code>atBegin</code> to true the watchers will start up the first time the <code>ncftp_watch</code> task is run, but any changed files that came before that run will not be uploaded. </p>
+<p>You should include <code>atBegin: true</code> so that the <code>ncftp_watch</code> command runs when <code>grunt watch</code> first starts up. This sets up the watchers to catch the changed files and add them to the queue, and start it up if there are already changed files (there shouldn't be at this point, so the <code>ncftp_push:watch</code> task won't run at this point). If you don't set <code>atBegin</code> to true the watchers will start up the first time the <code>ncftp_watch</code> task is run, but any changed files that came before that run will not be uploaded. </p>
 
 <p><code>spawn</code> must be set to false. The <code>ncftp_watch</code> task must run in the same process as the <code>watch</code> task so that it can capture <code>watch</code> events and internal <code>ncftp_start</code> and <code>ncftp_finish</code> events emmitted by the <code>ncftp_push</code> task. </p>
 
 <p><code>debounceDelay</code> can be set to whatever works for you but the default <code>500</code> seems to work well (so it can technically be left off).</p>
 
-<p>The <code>ncftp_watch</code> task should be your last <code>watch</code> task. This way it can capture all changed files from tasks that came before it and run an additional <code>ncftp_push:watch</code> task if there are any remaining changed files that haven't been pushed to the server yet when it runs (usually the watchers will have taken care of this so it won't start at this point).  </p>
+<p>The <code>ncftp_watch</code> task should be your last <code>watch</code> task. This way it can capture all changed files from tasks that came before it and run the <code>ncftp_push:watch</code> task for any changed files.  </p>
 
-<p>When you make changes to a file that causes changes to other files to be made by other watch tasks you will typically see the <code>ncftp_push:watch</code> task run multiple times.  This is because the event watcher catches the files and queues up an <code>ncftp_push:watch</code> task, then more changed files are caught while that task is waiting to be run, so when that <code>ncftp_push:watch</code> task finishes another one is queued. More files may be caught after that task is queued so it can happen again. As long as there are changed files in the queue it will queue another task each time the previous one finishes. </p>
+<p>If your watch tasks change additional files you may see the <code>ncftp_push:watch</code> task run twice. This is because grunt-watch doesn't seem to fire its event until after the next task is run so the <code>ncftp_watch</code> catches those files after <code>ncftp_push:watch</code> has already started running. When one <code>ncftp_push:watch</code> finishes it starts up another one for any remaining changed files that weren't in the list pushed to the server.</p>
 
-<p>This can also be useful to configure livereload to automatically reload your web page when files are changed. Just add <code>livereload: true</code> to the options. Check out the <code>grunt watch</code> documentation about configuring and using livereload.</p>
+<p>The <code>ncftp_watch</code> task can also be useful as a place to configure livereload to automatically reload your web page when files are changed. Just add <code>livereload: true</code> to the options. Check out the <code>grunt watch</code> documentation about configuring and using livereload.</p>
 
 <h3>
 <a id="usage-examples" class="anchor" href="#usage-examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage Examples</h3>
@@ -246,7 +248,7 @@ Required: false</p>
 
 <p>The format of this file is specified by <code>ncftp</code> and more documentation on it can be found in the <code>ncftp</code> docs. It contains the hostname, username and password for the destination ftp server.</p>
 
-<pre lang="txt"><code>host my.hostname.com
+<pre><code>host my.hostname.com
 user myUsername
 pass myPassword
 </code></pre>
@@ -300,7 +302,13 @@ pass myPassword
 <a id="release-history" class="anchor" href="#release-history" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Release History</h2>
 
 <ul>
-<li>2016/09/11 Initial release
+<li>0.1.0 - 2016/09/11 Initial release</li>
+<li>0.2.0 - 2016/09/26 
+
+<ul>
+<li>Combine all files with the same destination into one ncftpput command</li>
+<li>Rely on ncftp_watch command to start up ncftp_push at the end instead of checking if it's running for every changed file.</li>
+</ul>
 </li>
 </ul>
 
