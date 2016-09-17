@@ -175,17 +175,17 @@ The files given to this task will be used to match against changed files so that
 
 The `ncftp_watch` sub-task of the `watch` task is a typical `watch` task.  
 
-You should include `atBegin: true` so that the `ncftp_watch` command runs when `grunt watch` first starts up. This sets up the watchers to catch the changed files and keep track of whether the `ncftp_push:watch` task is queued, and start it up if there are already changed files (there shouldn't be at this point, so the `ncftp_push:watch` task won't run at this point). If you don't set `atBegin` to true the watchers will start up the first time the `ncftp_watch` task is run, but any changed files that came before that run will not be uploaded. 
+You should include `atBegin: true` so that the `ncftp_watch` command runs when `grunt watch` first starts up. This sets up the watchers to catch the changed files, and start it up if there are already changed files (there shouldn't be at this point, so the `ncftp_push:watch` task won't run at this point). If you don't set `atBegin` to true the watchers will start up the first time the `ncftp_watch` task is run, but any changed files that came before that run will not be uploaded. 
 
 `spawn` must be set to false. The `ncftp_watch` task must run in the same process as the `watch` task so that it can capture `watch` events and internal `ncftp_start` and `ncftp_finish` events emmitted by the `ncftp_push` task. 
 
 `debounceDelay` can be set to whatever works for you but the default `500` seems to work well (so it can technically be left off).
 
-The `ncftp_watch` task should be your last `watch` task. This way it can capture all changed files from tasks that came before it and run an additional `ncftp_push:watch` task if there are any remaining changed files that haven't been pushed to the server yet when it runs (usually the watchers will have taken care of this so it won't start at this point).  
+The `ncftp_watch` task should be your last `watch` task. This way it can capture all changed files from tasks that came before it and run the `ncftp_push:watch` task for any changed files.  
 
-When you make changes to a file that causes changes to other files to be made by other watch tasks you will typically see the `ncftp_push:watch` task run multiple times.  This is because the event watcher catches the files and queues up an `ncftp_push:watch` task, then more changed files are caught while that task is waiting to be run, so when that `ncftp_push:watch` task finishes another one is queued. More files may be caught after that task is queued so it can happen again. As long as there are changed files in the queue it will queue another task each time the previous one finishes. 
+If your watch tasks change additional files you may see the `ncftp_push:watch` task run twice. This is because grunt-watch doesn't seem to fire its event until after the next task is run so the `ncftp_watch` catches those files after `ncftp_push:watch` has already started running. When one `ncftp_push:watch` finishes it starts up another one for any remaining changed files that weren't in the list pushed to the server.
 
-This can also be useful to configure livereload to automatically reload your web page when files are changed. Just add `livereload: true` to the options. Check out the `grunt watch` documentation about configuring and using livereload.
+The `ncftp_watch` task can also be useful as a place to configure livereload to automatically reload your web page when files are changed. Just add `livereload: true` to the options. Check out the `grunt watch` documentation about configuring and using livereload.
 
 ### Usage Examples
 
@@ -195,7 +195,7 @@ This file's default name is `.ftpauth` and is in the same directory as your `Gru
 
 The format of this file is specified by `ncftp` and more documentation on it can be found in the `ncftp` docs. It contains the hostname, username and password for the destination ftp server.
 
-```txt
+```
 host my.hostname.com
 user myUsername
 pass myPassword
@@ -237,6 +237,7 @@ Please add unit tests in the root of the test folder for any new or changed func
 Thanks for contributing!
 
 ## Release History
-<ul>
-<li>2016/09/11 Initial release
-</ul>
+* 0.1.0 - 2016/09/11 Initial release
+* 0.2.0 - 2016/09/26 
+ * Combine all files with the same destination into one ncftpput command
+ * Rely on ncftp_watch command to start up ncftp_push at the end instead of checking if it's running for every changed file.
