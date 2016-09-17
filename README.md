@@ -135,7 +135,7 @@ File to send the debug info to if debug is true. The special string `stdout` mea
 
 #### Overview 
 
-The `ncftp_watch` task is meant to be used with `grunt watch`. It pushes changed files to the server when the `watch` event fires.  If one task is already running it will keep track of the changed files and run another task when the current one is finished.
+The `ncftp_watch` task is meant to be used with `grunt watch`. It starts up some a watcher to capture and queue up changed files when the `watch` event fires.  When there are changed files in the queue it starts the `ncfp_push:watch` task to push those files to the server.
 
 #### Usage
 In your project's Gruntfile, add a section named `ncftp_watch` to the data object passed into `grunt.initConfig()`. Also add a sub-task to the `watch` task in your grunt config that runs the `ncftp_watch` task.
@@ -174,7 +174,7 @@ The files given to this task will be used to match against changed files so that
 
 The `ncftp_watch` sub-task of the `watch` task is a typical `watch` task.  
 
-You should include `atBegin: true` so that the `ncftp_watch` command runs when `grunt watch` first starts up. This sets up the watchers to catch the changed files, and start it up if there are already changed files (there shouldn't be at this point, so the `ncftp_push:watch` task won't run at this point). If you don't set `atBegin` to true the watchers will start up the first time the `ncftp_watch` task is run, but any changed files that came before that run will not be uploaded. 
+You should include `atBegin: true` so that the `ncftp_watch` command runs when `grunt watch` first starts up. This sets up the watchers to catch the changed files and add them to the queue, and start it up if there are already changed files (there shouldn't be at this point, so the `ncftp_push:watch` task won't run at this point). If you don't set `atBegin` to true the watchers will start up the first time the `ncftp_watch` task is run, but any changed files that came before that run will not be uploaded. 
 
 `spawn` must be set to false. The `ncftp_watch` task must run in the same process as the `watch` task so that it can capture `watch` events and internal `ncftp_start` and `ncftp_finish` events emmitted by the `ncftp_push` task. 
 
